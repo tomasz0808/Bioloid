@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Bioloid</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main_menu">MainMenu</string>
+    <string name="title_activity_connect_to_robot">ConnectToRobot</string>
+    <string name="title_activity_connect_to_pc">ConnectToPC</string>
+    <string name="title_activity_bluetooth_message">BluetoothMessage</string>
+    <string name="title_activity_start">Start</string>
+
+</resources>

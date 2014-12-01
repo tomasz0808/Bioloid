@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.bioloid"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="20" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainMenu"
+            android:label="@string/title_activity_main_menu" >
+        </activity>
+        <activity
+            android:name=".ConnectToRobot"
+            android:label="@string/title_activity_connect_to_robot" >
+        </activity>
+        <activity
+            android:name=".ConnectToPC"
+            android:label="@string/title_activity_connect_to_pc" >
+        </activity>
+        <activity
+            android:name=".Speek"
+            android:label="@string/title_activity_bluetooth_message" >
+        </activity>
+
+        <service
+            android:name=".Speek"
+            android:enabled="true" />
+        <service
+            android:name=".SpechRecognition"
+            android:enabled="true" />
+
+        <activity
+            android:name=".Start"
+            android:label="@string/title_activity_start" >
+        </activity>
+    </application>
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+</manifest>
