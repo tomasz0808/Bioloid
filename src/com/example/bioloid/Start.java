@@ -13,7 +13,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.Menu;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class Start extends Activity {
@@ -32,6 +33,11 @@ public class Start extends Activity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_start);
 	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	    
+	    
+	    setBackground("angry");
+	    
+	    
 	    methodText = (TextView) findViewById(R.id.TextView1);
 	    resultsText = (TextView) findViewById(R.id.TextView2);
 	    activityContext = this;
@@ -47,6 +53,13 @@ public class Start extends Activity {
 //	    getMenuInflater().inflate(R.menu.main, menu);
 //	    return true;
 //	}
+
+	private void setBackground(String string) {
+		// TODO Auto-generated method stub
+		int resourceId= getResources().getIdentifier(string, "drawable", getPackageName());
+		getWindow().setBackgroundDrawableResource(resourceId);
+		
+	}
 
 	@Override
 	protected void onStart() {
