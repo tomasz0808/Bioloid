@@ -33,23 +33,26 @@ public final class R {
         public static final int supprised=0x7f020008;
     }
     public static final class id {
-        public static final int TextView01=0x7f080006;
-        public static final int TextView1=0x7f080004;
-        public static final int TextView2=0x7f08000f;
-        public static final int action_settings=0x7f080010;
-        public static final int bluetoothOnOffSwitch=0x7f080002;
-        public static final int bluetoothSearchButton=0x7f080003;
-        public static final int btPairedList=0x7f080007;
-        public static final int btSearchList=0x7f080005;
-        public static final int button1=0x7f080008;
-        public static final int connectToPcButton=0x7f08000b;
-        public static final int connectToRobotButton=0x7f08000c;
-        public static final int editText1=0x7f080009;
-        public static final int exitAppButton=0x7f08000a;
-        public static final int linearLayout1=0x7f080000;
-        public static final int list=0x7f08000e;
-        public static final int startButton=0x7f08000d;
-        public static final int switchStatus=0x7f080001;
+        public static final int TextView01=0x7f080009;
+        public static final int TextView1=0x7f080007;
+        public static final int TextView2=0x7f080012;
+        public static final int action_settings=0x7f080013;
+        public static final int bluetoothOnOffSwitch=0x7f080005;
+        public static final int bluetoothSearchButton=0x7f080006;
+        public static final int btPairedList=0x7f08000a;
+        public static final int btSearchList=0x7f080008;
+        public static final int button1=0x7f08000b;
+        public static final int connectToPcButton=0x7f08000e;
+        public static final int connectToRobotButton=0x7f08000f;
+        public static final int editText1=0x7f08000c;
+        public static final int exitAppButton=0x7f08000d;
+        public static final int linearLayout1=0x7f080003;
+        public static final int list=0x7f080011;
+        public static final int send=0x7f080001;
+        public static final int startButton=0x7f080010;
+        public static final int switchStatus=0x7f080004;
+        public static final int textin=0x7f080002;
+        public static final int textout=0x7f080000;
     }
     public static final class layout {
         public static final int activity_bluetooth_message=0x7f030000;
