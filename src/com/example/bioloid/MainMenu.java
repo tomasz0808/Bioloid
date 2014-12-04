@@ -1,6 +1,9 @@
 package com.example.bioloid;
 
+import java.io.IOException;
+
 import android.app.Activity;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,6 +60,13 @@ public class MainMenu extends Activity {
 		public void onClick(View v) 
 		{
 			System.exit(0);
+			BluetoothSocket socket = ConnectToRobot.getSocket();
+			try {
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	};
 	
