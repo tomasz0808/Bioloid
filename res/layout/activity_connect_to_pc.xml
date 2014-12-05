@@ -59,6 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:layout_marginLeft="30dp"
+                android:inputType="text"
+    			android:digits="0,1,2,3,4,5,6,7,8,9,."
                 android:ems="10" />
                  
 
@@ -74,25 +76,29 @@
 
                 <ToggleButton
                     android:id="@+id/connectionStatusToggleButton"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_width="120dp"
-                    android:layout_marginTop="10dp"
                     android:layout_marginLeft="25dp"
-                    android:layout_marginRight="10dp"                    
-                    android:text="ToggleButton" />
-
-                <TextView
-                    android:id="@+id/textField"
-                    android:layout_width="17dp"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="ToggleButton"
+                    android:textOff="Connect..."
+                    android:textOn="Disconnect..." />
 
                 <TextView
                     android:id="@+id/statusTextViewStatus"
-                    android:layout_width="200dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
                     android:text="Status:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/statusTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="10dp"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textSize="20sp" />
 

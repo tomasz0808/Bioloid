@@ -58,9 +58,9 @@ public final class R {
         public static final int saveChangesButton=0x7f09000b;
         public static final int serverIpAddress=0x7f090003;
         public static final int startButton=0x7f090014;
-        public static final int statusTextViewStatus=0x7f090007;
+        public static final int statusTextView=0x7f090007;
+        public static final int statusTextViewStatus=0x7f090006;
         public static final int switch1=0x7f090001;
-        public static final int textField=0x7f090006;
         public static final int textView1=0x7f090000;
         public static final int textView3=0x7f090002;
         public static final int textView6=0x7f090008;

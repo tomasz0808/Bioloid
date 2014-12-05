@@ -13,8 +13,11 @@ import java.net.UnknownHostException;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.InputType;
@@ -74,14 +77,11 @@ import android.widget.ToggleButton;
 	private Editor editor;
 	
 	//defined new variables
-	static final int portNumber = 10006;
+	static final int PORT_NUMBER = 10006;
 	public static SocketAddress  serverAddress;
-	
-	
-	
-	
+	private WifiManager wifiManager;
+	boolean wifiEnabled;
 	private String serverIpAddresString;
-	
 	
 	
 	
@@ -94,25 +94,31 @@ import android.widget.ToggleButton;
 	     
 	     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 	     StrictMode.setThreadPolicy(policy);
-	     
+	     wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 	     sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
 	     editor = sharedPreferences.edit();
 	     
-	     
+	    
 	     
 	     
 	     serverIpAddrText 	= (EditText)findViewById(R.id.serverIpAddress);
 	     intervalEditText 	= (EditText)findViewById(R.id.intervelMinutesEditText);
-	     statusTextView 	= (TextView)findViewById(R.id.statusTextViewStatus);
+	     statusTextView 	= (TextView)findViewById(R.id.statusTextView);
 	     ipTextView			= (TextView)findViewById(R.id.textView3);	     
 	     	          
 	     statusToggleButton = (ToggleButton)findViewById(R.id.connectionStatusToggleButton);
 	     saveChangesButton 	= (Button)findViewById(R.id.saveChangesButton);
 	     connectToPcSwitch 	= (Switch)findViewById(R.id.switch1);
 	     
-	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);	
+	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+	     
+	     serverIpAddrText.setText(sharedPreferences.getString("SERVER_IP_ADDRESS", null));
+	     statusTextView.setText("Disconnected");
+		 statusTextView.setTextColor(Color.parseColor("#FF0000"));
 	     
 //	    connectToPcSwitch.g
+	     
+	     serverIpAddrText.setSingleLine(true);
 	     
 	     //listener for switch
 		 connectToPcSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
@@ -130,17 +136,39 @@ import android.widget.ToggleButton;
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {				
 					if(isChecked){
 						serverIpAddresString = getIpFromEditText();
-						if(serverIpAddresString.isEmpty() & !isIpCorrect(serverIpAddresString)){
-							Toast.makeText(getApplicationContext(), "Please a proper server IP address", Toast.LENGTH_LONG).show();
+						wifiEnabled = wifiManager.isWifiEnabled(); 
+						if(!wifiManager.isWifiEnabled()){
+							Toast.makeText(getApplicationContext(), "Please turn on Wi-fi, and connect to network.", Toast.LENGTH_LONG).show();
 							statusToggleButton.setChecked(false);
-						}//else()					
-//						serverAddress = new InetSocketAddress(serverIpAddresString, 10006);
-						
+						}else if(serverIpAddresString.isEmpty() || !isIpCorrect(serverIpAddresString)){
+							Toast.makeText(getApplicationContext(), "IP address in invalid.", Toast.LENGTH_LONG).show();
+							statusToggleButton.setChecked(false);						
+						}else{
+							serverAddress = new InetSocketAddress(serverIpAddresString, PORT_NUMBER);
+							socketOut = new Socket();
+							 try {
+								socketOut.connect(serverAddress);
+								if(socketOut.isConnected()){
+									Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+									statusTextView.setText("Connected");
+									statusTextView.setTextColor(Color.parseColor("#AEFCB5"));
+									serverIpAddrText.setEnabled(false);
+									editor.putString("SERVER_IP_ADDRESS", serverIpAddresString);
+									editor.commit();
+								}								
+							} catch (IOException e) {
+								statusToggleButton.setChecked(false);
+								Toast.makeText(getApplicationContext(), "Unable to connect, check if IP is correct", Toast.LENGTH_LONG).show();															
+							}
+						}						
+					} else{
+						serverIpAddrText.setEnabled(true);
+						statusToggleButton.setChecked(false);
+						statusTextView.setText("Disconnected");
+						statusTextView.setTextColor(Color.parseColor("#FF0000"));
 					}
-					
 				}
 			});
-
 	 }
 
 	     
@@ -226,7 +254,7 @@ import android.widget.ToggleButton;
 
 	 
 	 
-	private boolean connectToServer(SocketAddress socketAddress2) {
+	private boolean connectToServer(SocketAddress socketAddress) {
 		 try {
 			 socketOut = new Socket();
 			 socketOut.connect(serverAddress);
