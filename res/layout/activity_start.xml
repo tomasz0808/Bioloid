@@ -9,7 +9,7 @@
     tools:context="com.example.bioloid.Start" >
 
     <TextView
-        android:id="@+id/TextView1"
+        android:id="@+id/deviceFound"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="4dip"
@@ -25,8 +25,8 @@
         android:id="@+id/TextView2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView1"
-        android:layout_below="@+id/TextView1"
+        android:layout_alignLeft="@+id/deviceFound"
+        android:layout_below="@+id/deviceFound"
         android:layout_marginTop="56dp"
         android:paddingBottom="4dip"
         android:text="Click the button and start speaking" />

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res/com.example.robot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/appBackground"
     tools:context="com.example.robot.ContactActivity" >
 
     <LinearLayout
@@ -26,14 +27,17 @@
                 android:layout_height="fill_parent" />
 
             <TextView
-                android:id="@+id/switchStatus"
-                android:layout_width="201dp"
-                android:layout_height="match_parent"
-                android:textSize="15sp" />
+                android:id="@+id/connectToPCText"
+                android:layout_width="230dp"
+                android:layout_height="60dp"   
+                android:layout_marginTop="0dp"
+        		android:textSize="15sp"/>
 
             <Switch
                 android:id="@+id/bluetoothOnOffSwitch"
                 android:layout_width="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
                 android:layout_height="match_parent" />
 
             <View
@@ -50,68 +54,65 @@
 
     <Button
         android:id="@+id/bluetoothSearchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_width="350dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="490dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A6A88A"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="25"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
         android:text="Search" />
 
     <TextView
-        android:id="@+id/TextView1"
+        android:id="@+id/deviceFound"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/linearLayout1"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="25dp"
         android:text="Devices found:"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp" />
 
     <ListView
         android:id="@+id/btSearchList"
         android:layout_width="wrap_content"
         android:layout_height="121dp"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/TextView1"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="25dp"
+        android:layout_below="@+id/deviceFound"
         android:ems="10"
         android:inputType="textMultiLine" >
     </ListView>
 
     <TextView
-        android:id="@+id/TextView01"
+        android:id="@+id/devicePaired"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView1"
+        android:layout_alignLeft="@+id/deviceFound"
         android:layout_below="@+id/btSearchList"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="40dp"
         android:text="Devices paired:"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp" />
 
     <ListView
         android:id="@+id/btPairedList"
         android:layout_width="wrap_content"
         android:layout_height="122dp"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/TextView01"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="25dp"
+        android:layout_below="@+id/devicePaired"
         android:ems="10"
         android:inputType="textMultiLine" >
     </ListView>
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/bluetoothSearchButton"
-        android:text="Button" />
-
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/bluetoothSearchButton"
-        android:layout_toLeftOf="@+id/bluetoothSearchButton"
-        android:ems="10"
-        android:inputType="number" />
    
 </RelativeLayout>

@@ -58,55 +58,72 @@ public class ConnectToRobot extends Activity {
 	
 	private Switch bluetoothSwitch;
 	private TextView switchStatus;
-	private Button searchButton;
-	int position;
 
+	int position;
 	
-	private Button testButton;
-	private EditText testText;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private TextView deviceFoundTextView;
+	private TextView devicePairedTextView;
+	private Button searchButton;
+	
+	
+	
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		speekIntent = new Intent(getApplicationContext(), Speek.class);
-		setContentView(R.layout.activity_connect_to_robot);		
+
+		setContentView(R.layout.activity_connect_to_robot);	
+		deviceFoundTextView = (TextView)findViewById(R.id.deviceFound);
+		devicePairedTextView = (TextView)findViewById(R.id.devicePaired);
 		
-		
+//		speekIntent = new Intent(getApplicationContext(), Speek.class);
 //		testSocket = ConnectToPC.socketOut;
 //		isConnected = ConnectToPC.isConnected;
-		try {
-			PCoutputStream = new DataOutputStream(testSocket.getOutputStream());
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		testText = (EditText)findViewById(R.id.editText1);
-		testButton = (Button)findViewById(R.id.button1);
-		testButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				if(isConnected){
-					try {
-						PCoutputStream.writeUTF(testText.getText().toString());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-			}
-		});
+//		try {
+//			PCoutputStream = new DataOutputStream(testSocket.getOutputStream());
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
+//		testText = (EditText)findViewById(R.id.serverIpAddress);
+//		testButton = (Button)findViewById(R.id.connectToServerButton);
+//		testButton.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				
+//				if(isConnected){
+//					try {
+//						PCoutputStream.writeUTF(testText.getText().toString());
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//			}
+//		});
 		
 		
 		
 		
 		
 		bluetoothSwitch = (Switch)findViewById(R.id.bluetoothOnOffSwitch);
-		switchStatus = (TextView)findViewById(R.id.switchStatus);
+		switchStatus = (TextView)findViewById(R.id.connectToPCText);
 		searchButton = (Button)findViewById(R.id.bluetoothSearchButton);
 	
 		searchDeviceList = (ListView)findViewById(R.id.btSearchList);		
@@ -125,13 +142,18 @@ public class ConnectToRobot extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked) {					
-					setParam(true);					
+					setParam(true);	
+					hideIcons(false);
 				}else{
 					pairedDevicesAdapter.clear();
 					setParam(false);
+					hideIcons(true);
 				}
-			}	
+			}
+
+			
 		});	
+		
 
 		searchButton.setOnClickListener(new OnClickListener() {			
 			@Override
@@ -140,6 +162,24 @@ public class ConnectToRobot extends Activity {
 			}
 		});		
 	}
+	
+	//method to hide icons if bt is off
+	private void hideIcons(boolean b) {
+		// TODO Auto-generated method stub
+		if(b){
+			deviceFoundTextView.setVisibility(View.GONE);
+			searchDeviceList.setVisibility(View.GONE);
+			devicePairedTextView.setVisibility(View.GONE);
+			pairedDeviceList.setVisibility(View.GONE);
+			searchButton.setVisibility(View.GONE);
+		} else{
+			deviceFoundTextView.setVisibility(View.VISIBLE);
+			searchDeviceList.setVisibility(View.VISIBLE);
+			devicePairedTextView.setVisibility(View.VISIBLE);
+			pairedDeviceList.setVisibility(View.VISIBLE);
+			searchButton.setVisibility(View.VISIBLE);
+		}						
+	}	
 
 	//creating sub-menu
 	@Override
@@ -197,12 +237,12 @@ public class ConnectToRobot extends Activity {
         socket.connect();
         outputStream = socket.getOutputStream();
         outputStream.write(sendMessageToRobot(1));
-        initConnection();
+//        initConnection();
 	}
 	private void initConnection()
 	{		
-		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
-		startService(speekIntent);
+//		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
+//		startService(speekIntent);
 	}
 	
 	 public synchronized static byte[] sendMessageToRobot(int i)
@@ -262,11 +302,13 @@ public class ConnectToRobot extends Activity {
 		}
 		else{
 			if(bluetoothAdapter.isEnabled()){
+				hideIcons(false);
 				bluetoothSwitch.setChecked(true);
 				switchStatus.setText(BLUEETOOTHON);	
 				pairedList();
 			}
 			else if(!bluetoothAdapter.isEnabled()){
+				hideIcons(true);
 				bluetoothSwitch.setChecked(false);	
 				switchStatus.setText(BLUEETOOTHOFF);
 			}
@@ -329,12 +371,11 @@ public class ConnectToRobot extends Activity {
 			if(param) {
 				bluetoothAdapter.enable();
 				switchStatus.setText(BLUEETOOTHON);	
-				searchButton.setEnabled(true);
+				
 				pairedList();
 			}else {
 				bluetoothAdapter.disable();
 				switchStatus.setText(BLUEETOOTHOFF);
-				searchButton.setEnabled(false);
 				btArrayAdapter.clear();
 			}
 		}

@@ -38,7 +38,7 @@ public class Start extends Activity {
 	    setBackground("angry");
 	    
 	    
-	    methodText = (TextView) findViewById(R.id.TextView1);
+	    methodText = (TextView) findViewById(R.id.deviceFound);
 	    resultsText = (TextView) findViewById(R.id.TextView2);
 	    activityContext = this;
 	    mBindFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH ? 0 : Context.BIND_ABOVE_CLIENT;
