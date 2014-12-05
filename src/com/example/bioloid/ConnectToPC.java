@@ -3,7 +3,6 @@ package com.example.bioloid;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -31,12 +30,16 @@ import android.widget.Toast;
 	String textReceived;
 	private BluetoothSocket btsocket;
 	private OutputStream outputStream;
-	public static Socket socket = null;
+	public static Socket socketOut = null;
+	public static Socket socketIn = null;
 	public static DataOutputStream dataOutputStream = null;
-	public static SocketAddress  socketAddress = new InetSocketAddress("192.168.0.104", 10006);
+	public static DataInputStream datainputStream = null;
+	public static SocketAddress  serverAddress = new InetSocketAddress("192.168.0.104", 10006);
+	public static InetSocketAddress myServerPort = new InetSocketAddress( 10006);
 	public Thread connectToServer;
-	public boolean isConnected;
+	public static boolean isConnected;
 	public String dataIn;
+	public String text;
 	
 	int message;
 
@@ -47,29 +50,34 @@ import android.widget.Toast;
 	     
 	     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 	     StrictMode.setThreadPolicy(policy);
-//	     connectToServer = new Thread(ListenForMessage);
+	     
 	     isConnected = false;
 	     connectToRobot = Toast.makeText(getApplicationContext(), "Please Connect to Robot first", Toast.LENGTH_LONG);
 	     textOut = (EditText)findViewById(R.id.textout);
+
 	     Button buttonSend = (Button)findViewById(R.id.send);
 	     textIn = (TextView)findViewById(R.id.textin);
 	     
-	     connectToSocket(socketAddress);
+	     connectToServer(serverAddress);
+	     connectToServer = new Thread(new ListenForMessage());
+	     connectToServer.start();
 
 	     if(isConnected == true){
 	    	 Toast.makeText(getApplicationContext(), "Succesfully connected to server", Toast.LENGTH_LONG).show();
-
+//	    	 connectToServer = new Thread(new ListenForMessage());
+//	    	 connectToServer.start();
 	     }
 //	     if(!dataIn.isEmpty()){
 //	    	 textIn.setText(dataIn);
 //	     }	     
 	     buttonSend.setOnClickListener(new OnClickListener() {
 			
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {
-				if(socket.isConnected())
+				if(socketOut.isConnected())
 					try {
-						dataOutputStream.writeUTF("Gówno");
+						dataOutputStream.writeUTF("Gowno");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -80,12 +88,14 @@ import android.widget.Toast;
 	     super.onCreate(savedInstanceState);	   
 	 }
 
-	private boolean connectToSocket(SocketAddress socketAddress2) {
+	private boolean connectToServer(SocketAddress socketAddress2) {
 		 try {
-			  socket = new Socket();
-			  socket.connect(socketAddress);
-			  dataOutputStream = new DataOutputStream(socket.getOutputStream());
-			  
+			 socketOut = new Socket();
+			 socketOut.connect(serverAddress);
+			 dataOutputStream = new DataOutputStream(socketOut.getOutputStream());
+			 datainputStream = new DataInputStream(socketOut.getInputStream());
+			 textIn.setText(text);
+			 
 //			  textIn.setText(dataInputStream.readUTF());
 			  isConnected = true;
 		 } catch (UnknownHostException e) {
@@ -97,7 +107,33 @@ import android.widget.Toast;
 		}
 		 return isConnected;
 	}
+	private class ListenForMessage extends Thread{
+		
+		
+		@Override
+		public void run() {
+			while(socketOut.isConnected()){
+				
+				try {
+				     
+					text = datainputStream.readUTF();
+					
+					runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                        	textOut.setText(text);
+                        }
+                    });
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			}
+		}
+		
 
+	}
 }
 	
 	

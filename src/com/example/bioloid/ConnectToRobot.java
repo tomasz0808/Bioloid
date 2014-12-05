@@ -1,5 +1,6 @@
 package com.example.bioloid;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,9 +47,13 @@ public class ConnectToRobot extends Activity {
 	private ListView pairedDeviceList;
 	private Set<BluetoothDevice> pairedDevices;
 	private OutputStream outputStream;
+	private DataOutputStream PCoutputStream;
 	private InputStream inStream;
 	public static BluetoothSocket socket;
 	private Intent speekIntent;
+	private boolean isConnected;
+	private Socket testSocket;
+	
 	
 	
 	private Switch bluetoothSwitch;
@@ -55,11 +61,49 @@ public class ConnectToRobot extends Activity {
 	private Button searchButton;
 	int position;
 
+	
+	private Button testButton;
+	private EditText testText;
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		speekIntent = new Intent(getApplicationContext(), Speek.class);
 		setContentView(R.layout.activity_connect_to_robot);		
+		
+		
+//		testSocket = ConnectToPC.socketOut;
+//		isConnected = ConnectToPC.isConnected;
+		try {
+			PCoutputStream = new DataOutputStream(testSocket.getOutputStream());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		testText = (EditText)findViewById(R.id.editText1);
+		testButton = (Button)findViewById(R.id.button1);
+		testButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				if(isConnected){
+					try {
+						PCoutputStream.writeUTF(testText.getText().toString());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			}
+		});
+		
+		
+		
+		
 		
 		bluetoothSwitch = (Switch)findViewById(R.id.bluetoothOnOffSwitch);
 		switchStatus = (TextView)findViewById(R.id.switchStatus);
