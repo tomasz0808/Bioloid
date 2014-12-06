@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
 import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
@@ -88,7 +89,7 @@ import android.widget.ToggleButton;
 	private String serverIpAddresString;
 	private String textFromInterval;
 	int intervalValue;
-	
+	private Intent speekIntent;
 	
 	
 	
@@ -98,7 +99,7 @@ import android.widget.ToggleButton;
 	 public void onCreate(Bundle savedInstanceState) {
 		 super.onCreate(savedInstanceState);
 	     setContentView(R.layout.activity_connect_to_pc);
-	     
+	     speekIntent = new Intent(getApplicationContext(), Speek.class);
 	     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 	     StrictMode.setThreadPolicy(policy);
 	     wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
@@ -123,28 +124,28 @@ import android.widget.ToggleButton;
 	    	 connectToPcSwitch.setChecked(false);
 	    	 hideIcons(true);
 	     }
+	     
+	     
 	     serverIpAddrText.setSingleLine(true);
 	     serverIpAddrText.setText(sharedPreferences.getString("SERVER_IP_ADDRESS", ""));
 	     
 	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-	     intervalValue = sharedPreferences.getInt("INTERVAL_TIME", 0);     
+	     intervalValue = sharedPreferences.getInt("INTERVAL_TIME", 0); 
+	     
+	     boolean lostConnectionOnStart = sharedPreferences.getBoolean("LOST_CONNECTION", true);
+	     
 	     if(intervalValue !=0){
 	    	 textFromInterval = Integer.toString(intervalValue);
 	    	 intervalEditText.setText(textFromInterval);
 	     } else
 	    	 intervalEditText.setText("30");
-	     if(socketOut != null){
+	     
+	     if(socketOut != null && !lostConnectionOnStart){
 	    	 if(socketOut.isConnected()){
-	    		 	Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
-					statusTextView.setText("Connected");
-					statusTextView.setTextColor(Color.parseColor("#24D91A"));
-					serverIpAddrText.setEnabled(false);
-					statusToggleButton.setChecked(true);
+	    		 	connect(true);
 	    	 }
 	     }else{
-		     statusTextView.setText("Disconnected");
-		     statusToggleButton.setChecked(false);
-		     statusTextView.setTextColor(Color.parseColor("#F03835"));
+		     connect(false);
 	     }
 	     
 	     
@@ -177,41 +178,39 @@ import android.widget.ToggleButton;
 							 try {
 								socketOut.connect(serverAddress, 2000);
 								if(socketOut.isConnected()){
-								
+									
+									editor.putString("SERVER_IP_ADDRESS", serverIpAddresString);
+									editor.commit();
 									datainputStream = new DataInputStream(socketOut.getInputStream());
 									
 							        new Thread(new Runnable() { 
 							            public void run(){
 							            	try {
-												if(datainputStream.read()==-1 && !lostConnection)	{															
-													lostConnection = true;	
-													
+												if(datainputStream.read()==-1 && !lostConnection)	{																													
+													lostConnection = true;													
 												}
 											} catch (IOException e){
 												lostConnection = true;
+												
 											}
 							            	if(lostConnection){							            	
 							            		ConnectToPC.this.runOnUiThread(new Runnable(){
 							                        public void run(){							                        																					
-																serverIpAddrText.setEnabled(true);
-																statusToggleButton.setChecked(false);
-																statusTextView.setText("Disconnected");
-																statusTextView.setTextColor(Color.parseColor("#F03835"));
-																lostConnection = true;						
-																Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_LONG).show();
+																connect(false);	
+																editor.putBoolean("LOST_CONNECTION", lostConnection);
+																editor.commit();	
+																lostConnection = false;		
+																speekIntent.putExtra("Text", "Warning. Connection to the server has been lost.");																	
+																startService(speekIntent);
+																Toast.makeText(getApplicationContext(), "Connection to server Lost", Toast.LENGTH_LONG).show();
 															}
 							            		});
 							            	}
 							            }
 							        }).start();
-
-											
-									Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
-									statusTextView.setText("Connected");
-									statusTextView.setTextColor(Color.parseColor("#24D91A"));
-									serverIpAddrText.setEnabled(false);
-									editor.putString("SERVER_IP_ADDRESS", serverIpAddresString);
-									editor.commit();
+							        
+							        connect(true);
+									
 								}								
 							} catch (IOException e) {
 								statusToggleButton.setChecked(false);
@@ -227,10 +226,7 @@ import android.widget.ToggleButton;
 								e.printStackTrace();
 							}
 						}
-						serverIpAddrText.setEnabled(true);
-						statusToggleButton.setChecked(false);
-						statusTextView.setText("Disconnected");
-						statusTextView.setTextColor(Color.parseColor("#F03835"));
+						connect(false);
 					}
 				}
 			});
@@ -303,7 +299,21 @@ import android.widget.ToggleButton;
 //		});	     	     
 //	     super.onCreate(savedInstanceState);	   
 //	 }
-	 
+	 public void connect(boolean b){
+		 if(b){
+			 	Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+			 	serverIpAddrText.setEnabled(false);
+			 	statusToggleButton.setChecked(true);
+				statusTextView.setText("Connected");
+				statusTextView.setTextColor(Color.parseColor("#24D91A"));		 
+		 } else{
+			 	serverIpAddrText.setEnabled(true);
+				statusToggleButton.setChecked(false);
+				statusTextView.setText("Disconnected");
+				statusTextView.setTextColor(Color.parseColor("#F03835"));
+			 
+		 }
+	 }
 
 	public String getIpFromEditText(){
 		 return serverIpAddrText.getText().toString();

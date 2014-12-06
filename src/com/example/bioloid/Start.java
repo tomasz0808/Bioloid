@@ -32,8 +32,7 @@ public class Start extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_start);
-	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	    
+	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);    
 	    
 	    setBackground("angry");
 	    
