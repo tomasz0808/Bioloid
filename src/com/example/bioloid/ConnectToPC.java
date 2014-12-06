@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.InputType;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -62,6 +63,7 @@ import android.widget.ToggleButton;
 	private EditText intervalEditText;
 
 	private TextView statusTextView;
+	private TextView statusTextView2;
 	private TextView ipTextView;
 
 	private Button saveChangesButton;
@@ -82,6 +84,8 @@ import android.widget.ToggleButton;
 	private WifiManager wifiManager;
 	boolean wifiEnabled;
 	private String serverIpAddresString;
+	private String textFromInterval;
+	int intervalValue;
 	
 	
 	
@@ -104,21 +108,29 @@ import android.widget.ToggleButton;
 	     serverIpAddrText 	= (EditText)findViewById(R.id.serverIpAddress);
 	     intervalEditText 	= (EditText)findViewById(R.id.intervelMinutesEditText);
 	     statusTextView 	= (TextView)findViewById(R.id.statusTextView);
+	     statusTextView2	= (TextView)findViewById(R.id.statusTextViewStatus2);
 	     ipTextView			= (TextView)findViewById(R.id.textView3);	     
 	     	          
 	     statusToggleButton = (ToggleButton)findViewById(R.id.connectionStatusToggleButton);
 	     saveChangesButton 	= (Button)findViewById(R.id.saveChangesButton);
 	     connectToPcSwitch 	= (Switch)findViewById(R.id.switch1);
 	     
-	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+	     serverIpAddrText.setSingleLine(true);
 	     
-	     serverIpAddrText.setText(sharedPreferences.getString("SERVER_IP_ADDRESS", null));
+	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+	     intervalValue = sharedPreferences.getInt("INTERVAL_TIME", 0);     
+	     if(intervalValue !=0){
+	    	 textFromInterval = Integer.toString(intervalValue);
+	    	 intervalEditText.setText(textFromInterval);
+	     } else
+	    	 intervalEditText.setText("30");
+//	     
 	     statusTextView.setText("Disconnected");
 		 statusTextView.setTextColor(Color.parseColor("#FF0000"));
-	     
+//	     
 //	    connectToPcSwitch.g
 	     
-	     serverIpAddrText.setSingleLine(true);
+	     
 	     
 	     //listener for switch
 		 connectToPcSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
@@ -151,7 +163,7 @@ import android.widget.ToggleButton;
 								if(socketOut.isConnected()){
 									Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
 									statusTextView.setText("Connected");
-									statusTextView.setTextColor(Color.parseColor("#AEFCB5"));
+									statusTextView.setTextColor(Color.parseColor("#24D91A"));
 									serverIpAddrText.setEnabled(false);
 									editor.putString("SERVER_IP_ADDRESS", serverIpAddresString);
 									editor.commit();
@@ -165,10 +177,28 @@ import android.widget.ToggleButton;
 						serverIpAddrText.setEnabled(true);
 						statusToggleButton.setChecked(false);
 						statusTextView.setText("Disconnected");
-						statusTextView.setTextColor(Color.parseColor("#FF0000"));
+						statusTextView.setTextColor(Color.parseColor("#5DED55"));
 					}
 				}
 			});
+		 
+		 saveChangesButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				textFromInterval = intervalEditText.getText().toString();
+				intervalValue = Integer.parseInt(textFromInterval);
+				if(intervalValue==0){
+					Toast.makeText(getApplicationContext(), "Please enter correct interval value", Toast.LENGTH_LONG).show();
+				} else{
+					editor.putInt("INTERVAL_TIME", intervalValue);
+					editor.commit();
+					intervalEditText.clearFocus();
+					Toast.makeText(getApplicationContext(), "Changes saved.", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	 }
 
 	     
@@ -243,11 +273,13 @@ import android.widget.ToggleButton;
 			serverIpAddrText.setVisibility(View.GONE);
 			statusToggleButton.setVisibility(View.GONE);
 			statusTextView.setVisibility(View.GONE);
+
 		} else{
 			ipTextView.setVisibility(View.VISIBLE);
 			serverIpAddrText.setVisibility(View.VISIBLE);
 			statusToggleButton.setVisibility(View.VISIBLE);
 			statusTextView.setVisibility(View.VISIBLE);
+			statusTextView2.setVisibility(View.VISIBLE);
 		}		
 	}
 	 
