@@ -83,9 +83,11 @@ import android.widget.ToggleButton;
 	public static SocketAddress  serverAddress;
 	private WifiManager wifiManager;
 	boolean wifiEnabled;
+	boolean isReportingEnabled;
 	private String serverIpAddresString;
 	private String textFromInterval;
 	int intervalValue;
+	
 	
 	
 	
@@ -115,7 +117,14 @@ import android.widget.ToggleButton;
 	     saveChangesButton 	= (Button)findViewById(R.id.saveChangesButton);
 	     connectToPcSwitch 	= (Switch)findViewById(R.id.switch1);
 	     
+	     if(sharedPreferences.getBoolean("IS_REPORTING", true))
+	    	 connectToPcSwitch.setChecked(true);
+	     else{
+	    	 connectToPcSwitch.setChecked(false);
+	    	 hideIcons(true);
+	     }
 	     serverIpAddrText.setSingleLine(true);
+	     serverIpAddrText.setText(sharedPreferences.getString("SERVER_IP_ADDRESS", ""));
 	     
 	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
 	     intervalValue = sharedPreferences.getInt("INTERVAL_TIME", 0);     
@@ -124,11 +133,9 @@ import android.widget.ToggleButton;
 	    	 intervalEditText.setText(textFromInterval);
 	     } else
 	    	 intervalEditText.setText("30");
-//	     
+     
 	     statusTextView.setText("Disconnected");
 		 statusTextView.setTextColor(Color.parseColor("#FF0000"));
-//	     
-//	    connectToPcSwitch.g
 	     
 	     
 	     
@@ -200,6 +207,17 @@ import android.widget.ToggleButton;
 			}
 		});
 	 }
+	 
+	 @Override
+		public void onBackPressed() {
+			super.onBackPressed();
+			if(connectToPcSwitch.isChecked()){
+				isReportingEnabled=true;
+				editor.putBoolean("IS_REPORTING", true);
+			}else
+				editor.putBoolean("IS_REPORTING", false);
+			editor.commit();
+		}
 
 	     
 //	     isConnected = false;
@@ -239,16 +257,7 @@ import android.widget.ToggleButton;
 //	     super.onCreate(savedInstanceState);	   
 //	 }
 	 
-	 private void init() {
-		ToggleButtonActions();
-		
-	}
-	
 
-	 //toggle button listener
-	private void ToggleButtonActions() {
-		
-	}
 	public String getIpFromEditText(){
 		 return serverIpAddrText.getText().toString();
 	 }
@@ -273,12 +282,14 @@ import android.widget.ToggleButton;
 			serverIpAddrText.setVisibility(View.GONE);
 			statusToggleButton.setVisibility(View.GONE);
 			statusTextView.setVisibility(View.GONE);
+			statusTextView2.setVisibility(View.GONE);
 
 		} else{
 			ipTextView.setVisibility(View.VISIBLE);
 			serverIpAddrText.setVisibility(View.VISIBLE);
 			statusToggleButton.setVisibility(View.VISIBLE);
 			statusTextView.setVisibility(View.VISIBLE);
+			statusTextView2.setVisibility(View.VISIBLE);
 			statusTextView2.setVisibility(View.VISIBLE);
 		}		
 	}

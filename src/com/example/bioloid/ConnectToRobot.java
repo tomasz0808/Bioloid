@@ -53,6 +53,7 @@ public class ConnectToRobot extends Activity {
 	private Intent speekIntent;
 	private boolean isConnected;
 	private Socket testSocket;
+	private Intent startIntent;
 	
 	
 	
@@ -88,6 +89,8 @@ public class ConnectToRobot extends Activity {
 		setContentView(R.layout.activity_connect_to_robot);	
 		deviceFoundTextView = (TextView)findViewById(R.id.deviceFound);
 		devicePairedTextView = (TextView)findViewById(R.id.devicePaired);
+		startIntent = new Intent(getApplicationContext(), Start.class);
+		
 		
 //		speekIntent = new Intent(getApplicationContext(), Speek.class);
 //		testSocket = ConnectToPC.socketOut;
@@ -158,7 +161,11 @@ public class ConnectToRobot extends Activity {
 		searchButton.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				startBT();				
+				if(searchButton.getText().toString().equalsIgnoreCase("Search")){
+				startBT();	
+				} else{
+				startActivity(startIntent);
+				}
 			}
 		});		
 	}
@@ -237,11 +244,13 @@ public class ConnectToRobot extends Activity {
         socket.connect();
         outputStream = socket.getOutputStream();
         outputStream.write(sendMessageToRobot(1));
-//        initConnection();
+        initConnection();
 	}
 	private void initConnection()
 	{		
 //		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
+		searchButton.setText("Start");
+		
 //		startService(speekIntent);
 	}
 	

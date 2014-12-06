@@ -92,17 +92,6 @@
         android:inputType="textMultiLine" >
     </ListView>
 
-    <TextView
-        android:id="@+id/devicePaired"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/deviceFound"
-        android:layout_below="@+id/btSearchList"
-        android:layout_marginTop="40dp"
-        android:text="Devices paired:"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="20sp" />
-
     <ListView
         android:id="@+id/btPairedList"
         android:layout_width="wrap_content"
@@ -114,5 +103,15 @@
         android:ems="10"
         android:inputType="textMultiLine" >
     </ListView>
+
+    <TextView
+        android:id="@+id/devicePaired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/deviceFound"
+        android:layout_centerVertical="true"
+        android:text="Devices paired:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp" />
    
 </RelativeLayout>

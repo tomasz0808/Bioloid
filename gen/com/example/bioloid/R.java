@@ -43,14 +43,14 @@ public final class R {
         public static final int action_settings=0x7f09001b;
         public static final int bluetoothOnOffSwitch=0x7f09000f;
         public static final int bluetoothSearchButton=0x7f090010;
-        public static final int btPairedList=0x7f090013;
+        public static final int btPairedList=0x7f090012;
         public static final int btSearchList=0x7f090011;
         public static final int connectToPCText=0x7f09000e;
         public static final int connectToPcButton=0x7f090016;
         public static final int connectToRobotButton=0x7f090015;
         public static final int connectionStatusToggleButton=0x7f090005;
         public static final int deviceFound=0x7f090004;
-        public static final int devicePaired=0x7f090012;
+        public static final int devicePaired=0x7f090013;
         public static final int exitAppButton=0x7f090018;
         public static final int intervelMinutesEditText=0x7f090009;
         public static final int linearLayout1=0x7f09000d;
