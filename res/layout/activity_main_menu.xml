@@ -9,48 +9,30 @@
     android:background="@color/appBackground"
     tools:context="com.example.robot.MainMenu" >
 
-
     <Button
-        android:id="@+id/startButton"
+        android:id="@+id/aboutButton"
         android:layout_width="270dp"
-        android:layout_height="65dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
+        android:layout_height="75dp"
+        android:layout_alignLeft="@+id/connectToPcButton"
+        android:layout_below="@+id/connectToPcButton"
+        android:layout_marginTop="55dp"
         android:background="@drawable/buttonshape"
-        android:onClick="startApp"
+        android:onClick="connectToPC"
         android:shadowColor="#A6A88A"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="25"
-        android:textSize="30sp"
-        android:text="Start"
-        android:textColor="#FFFFFF" />
-
-    <Button
-        android:id="@+id/connectToRobotButton"
-        android:layout_width="270dp"
-        android:layout_height="65dp"
-        android:layout_alignLeft="@+id/startButton"
-        android:layout_below="@+id/startButton"
-        android:layout_marginTop="40dp"        
-        android:onClick="connectToRobot"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#A6A88A"
-        android:shadowDx="5"
-        android:shadowDy="5"
-        android:shadowRadius="25"
-        android:text="Connect to Robot"
+        android:text="About"
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
 
     <Button
         android:id="@+id/connectToPcButton"
         android:layout_width="270dp"
-        android:layout_height="65dp"
-        android:layout_alignLeft="@+id/startButton"
-       	android:layout_below="@+id/connectToRobotButton"
-        android:layout_marginTop="40dp"
+        android:layout_height="75dp"
+        android:layout_alignLeft="@+id/connectToRobotButton"
+        android:layout_below="@+id/connectToRobotButton"
+        android:layout_marginTop="55dp"
         android:background="@drawable/buttonshape"
         android:onClick="connectToPC"
         android:shadowColor="#A6A88A"
@@ -62,38 +44,37 @@
         android:textSize="30sp" />
 
     <Button
-        android:id="@+id/aboutButton"
+        android:id="@+id/exitAppButton"
         android:layout_width="270dp"
-        android:layout_height="65dp"
-        android:layout_alignLeft="@+id/connectToPcButton"
-        android:layout_below="@+id/connectToPcButton"
-        android:layout_marginTop="40dp"
+        android:layout_height="75dp"
+        android:layout_alignLeft="@+id/aboutButton"
+        android:layout_below="@+id/aboutButton"
+        android:layout_marginTop="55dp"
         android:background="@drawable/buttonshape"
-        android:onClick="connectToPC"
+        android:onClick="exitApp"
         android:shadowColor="#A6A88A"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="25"
-        android:text="About"
+        android:text="Exit"
         android:textColor="#FFFFFF"
         android:textSize="30sp" />
-    
-    
+
     <Button
-        android:id="@+id/exitAppButton"
-        android:layout_alignLeft="@+id/startButton"
-        android:layout_below="@+id/aboutButton"
-        android:layout_marginTop="40dp"
-        android:onClick="exitApp"
-        android:text="Exit"
-        android:textSize="30sp"
+        android:id="@+id/connectToRobotButton"
+        android:layout_width="270dp"
+        android:layout_height="75dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:background="@drawable/buttonshape"
+        android:onClick="connectToRobot"
+        android:shadowColor="#A6A88A"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="25"
+        android:text="Start"
         android:textColor="#FFFFFF"
-		android:layout_width="270dp"
-		android:layout_height="65dp"
-		android:background="@drawable/buttonshape"
-		android:shadowColor="#A6A88A"
-		android:shadowDx="5"
-		android:shadowDy="5"
-		android:shadowRadius="25" />
+        android:textSize="30sp" />
 
 </RelativeLayout>

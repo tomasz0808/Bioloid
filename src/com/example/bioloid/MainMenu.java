@@ -79,10 +79,6 @@ public class MainMenu extends Activity {
 		intent = new Intent(MainMenu.this, ConnectToPC.class);
 		startActivity(intent);
 	}
-	public void startApp(View v) {
-		intent = new Intent(MainMenu.this, Start.class);
-		startActivity(intent);
-	}
 	
 	
 	

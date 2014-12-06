@@ -38,6 +38,7 @@ import android.widget.Toast;
 public class ConnectToRobot extends Activity {
 	
 	private TextView textview;
+	private static final String ROBOT_BT_MAC = "00:19:01:21:A2:E8";
 	final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 	private static final String BLUEETOOTHON = "Bluetooth is on. Click search button to start discovering.";
 	private static final String BLUEETOOTHOFF = "Bluetooth is off. Turn on to search for available devices.";
@@ -299,8 +300,10 @@ public class ConnectToRobot extends Activity {
 		pairedDevices = bluetoothAdapter.getBondedDevices();
 		//add them to the list
 		for(BluetoothDevice device : pairedDevices){
+			if(device.getAddress().equalsIgnoreCase(ROBOT_BT_MAC)){
 			pairedDevicesAdapter.add(device.getName()+ "\n" + device.getAddress());
 			pairedDevicesAdapter.notifyDataSetChanged();
+			}
 		}
 		
 	}
@@ -350,8 +353,10 @@ public class ConnectToRobot extends Activity {
 		        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
 		            // Add the name and address to an array adapter to show in a ListView
+		        	if(device.getAddress().equals(ROBOT_BT_MAC)){
 		            btArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-		            btArrayAdapter.notifyDataSetChanged();		            
+		            btArrayAdapter.notifyDataSetChanged();
+		        	}
 		        }
 		        //when devices is paired
 				if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
