@@ -42,6 +42,7 @@ public class Start extends Activity {
 	    resultsText = (TextView) findViewById(R.id.TextView2);
 	    activityContext = this;
 	    mBindFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH ? 0 : Context.BIND_ABOVE_CLIENT;
+	   
 	    speechService = new Intent(getApplicationContext(), SpechRecognition.class);
 	    activityContext.startService(speechService);
 	    

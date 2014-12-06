@@ -83,6 +83,7 @@ import android.widget.ToggleButton;
 	public static SocketAddress  serverAddress;
 	private WifiManager wifiManager;
 	boolean wifiEnabled;
+	boolean lostConnection;
 	boolean isReportingEnabled;
 	private String serverIpAddresString;
 	private String textFromInterval;
@@ -103,7 +104,6 @@ import android.widget.ToggleButton;
 	     wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 	     sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
 	     editor = sharedPreferences.edit();
-	     
 	    
 	     
 	     
@@ -133,10 +133,19 @@ import android.widget.ToggleButton;
 	    	 intervalEditText.setText(textFromInterval);
 	     } else
 	    	 intervalEditText.setText("30");
-     
-	     statusTextView.setText("Disconnected");
-		 statusTextView.setTextColor(Color.parseColor("#FF0000"));
-	     
+	     if(socketOut != null){
+	    	 if(socketOut.isConnected()){
+	    		 	Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+					statusTextView.setText("Connected");
+					statusTextView.setTextColor(Color.parseColor("#24D91A"));
+					serverIpAddrText.setEnabled(false);
+					statusToggleButton.setChecked(true);
+	    	 }
+	     }else{
+		     statusTextView.setText("Disconnected");
+		     statusToggleButton.setChecked(false);
+		     statusTextView.setTextColor(Color.parseColor("#F03835"));
+	     }
 	     
 	     
 	     //listener for switch
@@ -168,6 +177,35 @@ import android.widget.ToggleButton;
 							 try {
 								socketOut.connect(serverAddress, 2000);
 								if(socketOut.isConnected()){
+								
+									datainputStream = new DataInputStream(socketOut.getInputStream());
+									
+							        new Thread(new Runnable() { 
+							            public void run(){
+							            	try {
+												if(datainputStream.read()==-1 && !lostConnection)	{															
+													lostConnection = true;	
+													
+												}
+											} catch (IOException e){
+												lostConnection = true;
+											}
+							            	if(lostConnection){							            	
+							            		ConnectToPC.this.runOnUiThread(new Runnable(){
+							                        public void run(){							                        																					
+																serverIpAddrText.setEnabled(true);
+																statusToggleButton.setChecked(false);
+																statusTextView.setText("Disconnected");
+																statusTextView.setTextColor(Color.parseColor("#F03835"));
+																lostConnection = true;						
+																Toast.makeText(getApplicationContext(), "Connection Lost", Toast.LENGTH_LONG).show();
+															}
+							            		});
+							            	}
+							            }
+							        }).start();
+
+											
 									Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
 									statusTextView.setText("Connected");
 									statusTextView.setTextColor(Color.parseColor("#24D91A"));
@@ -181,6 +219,14 @@ import android.widget.ToggleButton;
 							}
 						}						
 					} else{
+						if(socketOut.isConnected()){
+							try {
+								socketOut.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
 						serverIpAddrText.setEnabled(true);
 						statusToggleButton.setChecked(false);
 						statusTextView.setText("Disconnected");
@@ -207,6 +253,7 @@ import android.widget.ToggleButton;
 			}
 		});
 	 }
+	 
 	 
 	 @Override
 		public void onBackPressed() {
@@ -315,30 +362,6 @@ import android.widget.ToggleButton;
 			isConnected = false;
 		}
 		 return isConnected;
-	}
-	 class ListenForMessage extends Thread{
-		
-		
-		@Override
-		public void run() {
-			while(socketOut.isConnected()){				
-				try {				     
-					text = datainputStream.readUTF();					
-					runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        	textOut.setText(text);
-                        }
-                    });
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
-			}
-		}
-		
-
 	}
 }
 	

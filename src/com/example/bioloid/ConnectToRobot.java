@@ -91,9 +91,8 @@ public class ConnectToRobot extends Activity {
 		deviceFoundTextView = (TextView)findViewById(R.id.deviceFound);
 		devicePairedTextView = (TextView)findViewById(R.id.devicePaired);
 		startIntent = new Intent(getApplicationContext(), Start.class);
-		
-		
-//		speekIntent = new Intent(getApplicationContext(), Speek.class);
+			
+		speekIntent = new Intent(getApplicationContext(), Speek.class);
 //		testSocket = ConnectToPC.socketOut;
 //		isConnected = ConnectToPC.isConnected;
 //		try {
@@ -249,10 +248,9 @@ public class ConnectToRobot extends Activity {
 	}
 	private void initConnection()
 	{		
-//		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
-		searchButton.setText("Start");
-		
-//		startService(speekIntent);
+		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
+		searchButton.setText("Start");		
+		startService(speekIntent);
 	}
 	
 	 public synchronized static byte[] sendMessageToRobot(int i)
