@@ -159,7 +159,7 @@ import android.widget.ToggleButton;
 							serverAddress = new InetSocketAddress(serverIpAddresString, PORT_NUMBER);
 							socketOut = new Socket();
 							 try {
-								socketOut.connect(serverAddress);
+								socketOut.connect(serverAddress, 2000);
 								if(socketOut.isConnected()){
 									Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
 									statusTextView.setText("Connected");
@@ -177,7 +177,7 @@ import android.widget.ToggleButton;
 						serverIpAddrText.setEnabled(true);
 						statusToggleButton.setChecked(false);
 						statusTextView.setText("Disconnected");
-						statusTextView.setTextColor(Color.parseColor("#5DED55"));
+						statusTextView.setTextColor(Color.parseColor("#F03835"));
 					}
 				}
 			});
@@ -305,7 +305,7 @@ import android.widget.ToggleButton;
 		}
 		 return isConnected;
 	}
-	private class ListenForMessage extends Thread{
+	 class ListenForMessage extends Thread{
 		
 		
 		@Override
