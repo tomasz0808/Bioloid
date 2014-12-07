@@ -9,6 +9,11 @@
     <string name="title_activity_connect_to_pc">ConnectToPC</string>
     <string name="title_activity_bluetooth_message">BluetoothMessage</string>
     <string name="title_activity_start">Start</string>
-    <string name="whatIsYourNameText">Hello, what is your name?</string>
+    <string name="whatIsYourNameText0">Hello, what is your name?</string>
+    <string name="whatIsYourNameText1">Hi, what is your name?</string>
+    <string name="whatIsYourNameText2">Hi, how should I call you?</string>
+    <string name="whatIsYourNameText3">Hello, how would you like me to call you</string>
+    <string name="confirmName0">Is it</string>
+    <string name="confirmName1">Did you say</string>
 
 </resources>

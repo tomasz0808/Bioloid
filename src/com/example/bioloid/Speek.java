@@ -3,21 +3,25 @@ package com.example.bioloid;
 import java.util.Locale;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 
 public class Speek extends Service implements OnInitListener {
 
-	private TextToSpeech textToSpeech;
+	public static TextToSpeech textToSpeech;
 	private String str;
+	AudioManager aMenager;
 	
 	
 
 	
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
+		aMenager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		textToSpeech = new TextToSpeech(this, this);
 		str =(String) intent.getExtras().get("Text");
 		return START_STICKY;
@@ -57,5 +61,16 @@ public class Speek extends Service implements OnInitListener {
 	      textToSpeech.speak(str,
 	                TextToSpeech.QUEUE_FLUSH, 
 	                null);
+	      aMenager.setMicrophoneMute(true);
+	      while(textToSpeech.isSpeaking()){
+	    	  
+				
+			}	     	     
+	      aMenager.setMicrophoneMute(false);
+	      synchronized (Start.waitForTTStoFinishString) {
+	    	  Start.waitForTTStoFinishString.notify();
+		}
+	      Start.sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
+			
 	}
 }

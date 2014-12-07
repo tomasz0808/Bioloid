@@ -3,10 +3,9 @@ package com.example.bioloid;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Timer;
+import java.util.Random;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,7 +14,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.ActivityInfo;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -31,37 +30,50 @@ public class Start extends Activity {
 	//shared preferences
 	private SharedPreferences sharedPreferences;
 	private Editor editor;
-	public boolean isReportingToPC = false;
 	
-	public boolean isFinished = false;
 	
-	public int intervalTime;
+	
 	public Socket pcSocket;
 	public DataOutputStream pcOutput;
 	
 	
-	protected static final boolean DEBUG = false;
-	protected static final String TAG = null;
-	private int mBindFlag;
-	public String datapassed;
+
+
+	
+	
 	private Intent recognizeSpeechService;
 	private Intent speekService;
 	public static TextView methodText;
 	public static TextView resultsText;
 	private static Messenger mServiceMessenger;
-	Timer timer = new Timer();
+//	Timer timer = new Timer();
 	MyReceiver myReceiver;
-	public ConversationThread conversation;
-
 	
-	public boolean threadStop = false;
-	public boolean isConnectedToPC = false;
-	public boolean lostConnection = false;
+	
+	
+	
+
+	protected static final boolean DEBUG = false;
+	public 	boolean threadStop = false;
+	public 	boolean isConnectedToPC = false;
+	public 	boolean lostConnection = false;
 	private boolean tutorialStart;
 	private boolean textRecognized;
-	public String datapassedaaaa;
+	public 	boolean isReportingToPC = false;	
+	public 	boolean isFinished = false;
 	
+	protected static final String TAG = null;
+	public String datapassed;
+	public String stringForWaitUser;
+	public static String waitForTTStoFinishString;
+	public 	int intervalTime;
+	private int mBindFlag;
 	
+	public TutorialThread tutorialThread;
+	public ConversationThread conversationThread;
+	
+	AudioManager audioManager;
+	Random rand;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,26 +81,29 @@ public class Start extends Activity {
 	    setContentView(R.layout.activity_start);  
 	    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	    setBackground("angry");
-	    datapassedaaaa = "";
+	    stringForWaitUser = "";
+	    waitForTTStoFinishString = "";
+	    rand = new Random();
 	    speekService = new Intent(getApplicationContext(), Speek.class);
 	    recognizeSpeechService = new Intent(getApplicationContext(), SpechRecognition.class);
 
-	    conversation = new ConversationThread();
-	    sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
-
-	    intervalTime = sharedPreferences.getInt("INTERVAL_TIME", 15);
-	    lostConnection = sharedPreferences.getBoolean("LOST_CONNECTION", false);
-	    tutorialStart = sharedPreferences.getBoolean("TUTORIAL_START", false);
-//	    isReportingToPC = sharedPreferences.getBoolean("IS_REPORTING", false);
-	       
-	    	pcSocket = ConnectToPC.socketOut;
+	    
+	    
+	    	    	    
+	    sharedPreferences 	= getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
+	    intervalTime 		= sharedPreferences.getInt("INTERVAL_TIME", 15);
+	    lostConnection 		= sharedPreferences.getBoolean("LOST_CONNECTION", false);
+	    tutorialStart 		= sharedPreferences.getBoolean("TUTORIAL_START", false);
+	    
+	    conversationThread 	= new ConversationThread();
+	    tutorialThread 		= new TutorialThread();
+		
+	    pcSocket 			= ConnectToPC.socketOut;
 	    	if(pcSocket !=null && pcSocket.isConnected()){
-	    		
 	    		try {
 	    			pcOutput = new DataOutputStream(pcSocket.getOutputStream());
 	    			isConnectedToPC = true;
 	    		} catch (IOException e) {
-				// TODO Auto-generated catch block
 	    			e.printStackTrace();
 	    		}
 	    }
@@ -96,22 +111,20 @@ public class Start extends Activity {
 	    
 	    methodText 	= (TextView) findViewById(R.id.deviceFound);
 	    resultsText = (TextView) findViewById(R.id.TextView2);
-	    mBindFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH ? 0 : Context.BIND_ABOVE_CLIENT;
-	 
-	  
+	    mBindFlag 	= Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH ? 0 : Context.BIND_ABOVE_CLIENT;
+	 	  
 	    myReceiver = new MyReceiver();
-	    IntentFilter intentFilter = new IntentFilter();
+	    IntentFilter intentFilter = new IntentFilter(); 
 	    intentFilter.addAction(SpechRecognition.MY_ACTION);
 	    registerReceiver(myReceiver, intentFilter);
-
-	    
-	    
-
 	}
 
+	public int getRandom(int range){
+		return rand.nextInt(range);
+	}
 
 	public void sayText(String say){
-//		stopService(speekService);
+//		while(speekService.getAction().isEmpty())
 		speekService.putExtra("Text", say);																	
 		startService(speekService);
 	}
@@ -122,6 +135,16 @@ public class Start extends Activity {
 //		speekService.putExtra("Text", say);																	
 //		startService(speekService);
 	}
+	public void sayTextFromResourcesRandom(String say, int range){
+		StringBuilder sb = new StringBuilder (String.valueOf(say));
+		sb.append (getRandom(range));
+		say = sb.toString();
+
+		int getResID = getResources().getIdentifier(say, "string", getPackageName());
+		say = getString(getResID);
+		speekService.putExtra("Text", say);																	
+		startService(speekService);
+	}
 	
 	public void setBackground(String string) {
 		// TODO Auto-generated method stub
@@ -131,13 +154,17 @@ public class Start extends Activity {
 	}
 
 	@Override
-	protected void onStart() {
-		 
+	protected void onStart() {		 
 	    super.onStart();
-	    speekService.putExtra("Text", "");
-	    startService(speekService);	    
+	    if(tutorialStart){
+	    	tutorialThread.start();
+	    }else{
+	    	conversationThread.start();
+	    }
+//	    speekService.putExtra("Text", "");
+//	    startService(speekService);	    
 	    startService(recognizeSpeechService);
-	    conversation.start();
+	   
 	    
 
 
@@ -164,7 +191,7 @@ public class Start extends Activity {
 	    public void onServiceConnected(ComponentName name, IBinder service){
 	        if (DEBUG) {Log.d(TAG, "onServiceConnected");} //$NON-NLS-1$
 		        mServiceMessenger = new Messenger(service);
-		        sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
+//		        sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 	    }
 	    @Override
 	    public void onServiceDisconnected(ComponentName name){
@@ -184,7 +211,7 @@ public class Start extends Activity {
 	     }
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	@Override
 	protected void onDestroy(){
 	    super.onDestroy();
@@ -199,21 +226,29 @@ public class Start extends Activity {
 		return isLost;
 	}
 	
-	public void waitThread() throws InterruptedException{
-		conversation.wait();
-	}
-	  public void waitForUser(){
-		  
-		  synchronized (datapassedaaaa) {
+	
+	public void waitForUser(){	  
+		
+		  synchronized (stringForWaitUser) {
 				try {
-					datapassedaaaa.wait();
+					stringForWaitUser.wait();
+					waitForTTStoFinishString.wait();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}	
+				}
+				
+		  }
+	}
+	public void waitForTTStoFinish(){	  
+		synchronized (waitForTTStoFinishString) {
+			try {
+				waitForTTStoFinishString.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		  
-		  }
-		  }
+	}
 	
 	
 	private class MyReceiver extends BroadcastReceiver{
@@ -222,53 +257,42 @@ public class Start extends Activity {
 		 public void onReceive(Context arg0, Intent arg1) {
 		  // TODO Auto-generated method stub
 		  
-		  datapassed = arg1.getStringExtra("DATAPASSED");
-		  if(datapassed.equalsIgnoreCase("Yes"))
-			  synchronized (datapassedaaaa) {
-				  datapassedaaaa.notifyAll();
+		  datapassed = arg1.getStringExtra("DATAPASSED");		  
+			  synchronized (stringForWaitUser) {
+				  stringForWaitUser.notify();
 			}
-			  	
-	
-		 
-//		  conversation.w
-//		  if(datapassed.equalsIgnoreCase("hello"));
-//		  	notify();
 		  
-//		  NotificationManager nm = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		    //Create the notification here.
-//		    nm.no
-		  
-		  
-	
-		  
-		  
-		  if(datapassed.equalsIgnoreCase("yes")){
-			  isFinished = true;
-			 
-		  
-		 }else if(datapassed.equalsIgnoreCase("normal")){
-			 setBackground("normal");
-		 }else if(datapassed.equalsIgnoreCase("angry")){
-			 setBackground("normal");
-		 }else if(datapassed.equalsIgnoreCase("happy")){
-			 setBackground("happy");
-		 }else if(datapassed.equalsIgnoreCase("sad")){
-			 setBackground("sad");
-		 }else if(datapassed.equalsIgnoreCase("fuck you")){
-			 sayText("Fuck you too !");
-		 }else if(datapassed.equalsIgnoreCase("sleep")){
-			 sayText("I'm going to sleep");			
-		 }
-		 else if(datapassed.equalsIgnoreCase("help") && isConnectedToPC){
-			 try {
-				pcOutput.writeUTF("Help");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//		  if(datapassed.equalsIgnoreCase("yes")){
+//			  isFinished = true;
+//			 
+//		  
+//		 }else if(datapassed.equalsIgnoreCase("normal")){
+//			 setBackground("normal");
+//		 }else if(datapassed.equalsIgnoreCase("angry")){
+//			 setBackground("normal");
+//		 }else if(datapassed.equalsIgnoreCase("happy")){
+//			 setBackground("happy");
+//		 }else if(datapassed.equalsIgnoreCase("sad")){
+//			 setBackground("sad");
+//		 }else if(datapassed.equalsIgnoreCase("fuck you")){
+//			 sayText("Fuck you too !");
+//		 }else if(datapassed.equalsIgnoreCase("sleep")){
+//			 sayText("I'm going to sleep");			
+//		 }
+			  
+			  
+			  
+			  
+//		 else if(datapassed.equalsIgnoreCase("help") && isConnectedToPC){
+//			 try {
+//				pcOutput.writeUTF("Help");
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			 
 			
-		 }
+//		 }
 		 }}
 	private class ConversationThread extends Thread
 	{
@@ -278,15 +302,55 @@ public class Start extends Activity {
 			// TODO Auto-generated method stub
 			super.run();
 			while(!threadStop){
-				sayText("start onew");
+				
+				
+				
+				
+				
+				sayText("Conversation");
 				waitForUser();
-				sayText("start two after");
-				waitForUser();
+				if(ifYes()){
+					sayText("said yes");
+					waitForUser();}
+				else if(ifNo()){
+					sayText("said no");
+					waitForUser();}
+				else{
+					sayText("said something else");
+					waitForUser();
+				}
 			}
 
 		
 		}
-		
+		public boolean ifYes(){
+			return datapassed.equalsIgnoreCase("yes");
+		}
+		public boolean ifNo(){
+			return datapassed.equalsIgnoreCase("no");
+		}
+	}
+	private class TutorialThread extends Thread
+	{
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			super.run();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			while(!threadStop){
+				sayTextFromResourcesRandom("whatIsYourNameText", 4);
+				waitForUser();
+				sayTextFromResourcesRandom("confirmName", 2);
+				waitForTTStoFinish();
+				sayText(datapassed);
+				
+//			}
+		}
 	}
 
 }
