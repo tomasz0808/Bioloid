@@ -36,45 +36,18 @@ import android.widget.ToggleButton;
 
 	public class ConnectToPC extends Activity {
 
-		
-	EditText textOut;
-	TextView textIn;
-	Toast connectToRobot; 
-	String textReceived;
-	private BluetoothSocket btsocket;
-	private OutputStream outputStream;
 	public static Socket socketOut = null;
-	public static Socket socketIn = null;
-	public static DataOutputStream dataOutputStream = null;
 	public static DataInputStream datainputStream = null;
-	
-	
-	
-	
-	
-	public static InetSocketAddress myServerPort = new InetSocketAddress( 10006);
-	public Thread connectToServer;
-	public static boolean isConnected;
-	public String dataIn;
-	public String text;	
-	int message;
-
-	//defined new layout components
+	public static InetSocketAddress myServerPort = new InetSocketAddress( 10006);	
 	private EditText serverIpAddrText;	
 	private EditText intervalEditText;
-
 	private TextView statusTextView;
 	private TextView statusTextView2;
 	private TextView ipTextView;
-
 	private Button saveChangesButton;
 	private ToggleButton statusToggleButton;
 	private Switch connectToPcSwitch;
-
-
-//	private Toast informToast;
-	
-	
+		
 	//shared preferences
 	private SharedPreferences sharedPreferences;
 	private Editor editor;
@@ -105,15 +78,12 @@ import android.widget.ToggleButton;
 	     wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 	     sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
 	     editor = sharedPreferences.edit();
-	    
-	     
 	     
 	     serverIpAddrText 	= (EditText)findViewById(R.id.serverIpAddress);
 	     intervalEditText 	= (EditText)findViewById(R.id.intervelMinutesEditText);
 	     statusTextView 	= (TextView)findViewById(R.id.statusTextView);
 	     statusTextView2	= (TextView)findViewById(R.id.statusTextViewStatus2);
-	     ipTextView			= (TextView)findViewById(R.id.textView3);	     
-	     	          
+	     ipTextView			= (TextView)findViewById(R.id.textView3);	     	     	          
 	     statusToggleButton = (ToggleButton)findViewById(R.id.connectionStatusToggleButton);
 	     saveChangesButton 	= (Button)findViewById(R.id.saveChangesButton);
 	     connectToPcSwitch 	= (Switch)findViewById(R.id.switch1);
@@ -124,14 +94,11 @@ import android.widget.ToggleButton;
 	    	 connectToPcSwitch.setChecked(false);
 	    	 hideIcons(true);
 	     }
-	     
-	     
+	     	     
 	     serverIpAddrText.setSingleLine(true);
-	     serverIpAddrText.setText(sharedPreferences.getString("SERVER_IP_ADDRESS", ""));
-	     
+	     serverIpAddrText.setText(sharedPreferences.getString("SERVER_IP_ADDRESS", ""));	     
 	     intervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-	     intervalValue = sharedPreferences.getInt("INTERVAL_TIME", 0); 
-	     
+	     intervalValue = sharedPreferences.getInt("INTERVAL_TIME", 0); 	     
 	     boolean lostConnectionOnStart = sharedPreferences.getBoolean("LOST_CONNECTION", true);
 	     
 	     if(intervalValue !=0){
@@ -146,8 +113,7 @@ import android.widget.ToggleButton;
 	    	 }
 	     }else{
 		     connect(false);
-	     }
-	     
+	     }	     
 	     
 	     //listener for switch
 		 connectToPcSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
@@ -177,11 +143,13 @@ import android.widget.ToggleButton;
 							socketOut = new Socket();
 							 try {
 								socketOut.connect(serverAddress, 2000);
-								if(socketOut.isConnected()){
-									
+								if(socketOut.isConnected()){									
 									editor.putString("SERVER_IP_ADDRESS", serverIpAddresString);
 									editor.commit();
 									datainputStream = new DataInputStream(socketOut.getInputStream());
+									lostConnection = false;
+									editor.putBoolean("LOST_CONNECTION", lostConnection);
+									editor.commit();
 									
 							        new Thread(new Runnable() { 
 							            public void run(){
@@ -190,8 +158,7 @@ import android.widget.ToggleButton;
 													lostConnection = true;													
 												}
 											} catch (IOException e){
-												lostConnection = true;
-												
+												lostConnection = true;												
 											}
 							            	if(lostConnection){							            	
 							            		ConnectToPC.this.runOnUiThread(new Runnable(){
@@ -207,10 +174,8 @@ import android.widget.ToggleButton;
 							            		});
 							            	}
 							            }
-							        }).start();
-							        
-							        connect(true);
-									
+							        }).start();							        
+							        connect(true);									
 								}								
 							} catch (IOException e) {
 								statusToggleButton.setChecked(false);
@@ -231,11 +196,9 @@ import android.widget.ToggleButton;
 				}
 			});
 		 
-		 saveChangesButton.setOnClickListener(new OnClickListener() {
-			
+		 saveChangesButton.setOnClickListener(new OnClickListener() {		
 			@Override
-			public void onClick(View v) {
-				
+			public void onClick(View v) {				
 				textFromInterval = intervalEditText.getText().toString();
 				intervalValue = Integer.parseInt(textFromInterval);
 				if(intervalValue==0){
@@ -262,43 +225,6 @@ import android.widget.ToggleButton;
 			editor.commit();
 		}
 
-	     
-//	     isConnected = false;
-//	     connectToRobot = Toast.makeText(getApplicationContext(), "Please Connect to Robot first", Toast.LENGTH_LONG);
-//	     textOut = (EditText)findViewById(R.id.textout);
-
-//	     Button buttonSend = (Button)findViewById(R.id.send);
-//	     textIn = (TextView)findViewById(R.id.textin);
-	     
-//	     connectToServer(serverAddress);
-//	     connectToServer = new Thread(new ListenForMessage());
-//	     connectToServer.start();
-
-//	     if(isConnected == true){
-//	    	 Toast.makeText(getApplicationContext(), "Succesfully connected to server", Toast.LENGTH_LONG).show();
-//	    	 connectToServer = new Thread(new ListenForMessage());
-//	    	 connectToServer.start();
-//	     }
-//	     if(!dataIn.isEmpty()){
-//	    	 textIn.setText(dataIn);
-//	     }	     
-//	     buttonSend.setOnClickListener(new OnClickListener() {
-//			
-//			@SuppressWarnings("deprecation")
-//			@Override
-//			public void onClick(View v) {
-//				if(socketOut.isConnected())
-//					try {
-//						dataOutputStream.writeUTF("Gowno");
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} 
-//				
-//			}
-//		});	     	     
-//	     super.onCreate(savedInstanceState);	   
-//	 }
 	 public void connect(boolean b){
 		 if(b){
 			 	Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
@@ -310,8 +236,7 @@ import android.widget.ToggleButton;
 			 	serverIpAddrText.setEnabled(true);
 				statusToggleButton.setChecked(false);
 				statusTextView.setText("Disconnected");
-				statusTextView.setTextColor(Color.parseColor("#F03835"));
-			 
+				statusTextView.setTextColor(Color.parseColor("#F03835"));			 
 		 }
 	 }
 
@@ -328,10 +253,7 @@ import android.widget.ToggleButton;
 		    	isIPv4 = false;
 		    }
 		    return isIPv4;
-	}
-	
-	
-	
+	}	
 	
 	public void hideIcons(Boolean b){
 		if(b){
@@ -349,29 +271,6 @@ import android.widget.ToggleButton;
 			statusTextView2.setVisibility(View.VISIBLE);
 			statusTextView2.setVisibility(View.VISIBLE);
 		}		
-	}
-	 
-
-	 
-	 
-	private boolean connectToServer(SocketAddress socketAddress) {
-		 try {
-			 socketOut = new Socket();
-			 socketOut.connect(serverAddress);
-			 dataOutputStream = new DataOutputStream(socketOut.getOutputStream());
-			 datainputStream = new DataInputStream(socketOut.getInputStream());
-			 textIn.setText(text);
-			 
-//			  textIn.setText(dataInputStream.readUTF());
-			  isConnected = true;
-		 } catch (UnknownHostException e) {
-			Toast.makeText(getApplicationContext(), "Unable to connect", Toast.LENGTH_LONG).show();
-			isConnected = false;
-		 } catch (IOException e) {
-			Toast.makeText(getApplicationContext(), "Unable to connect", Toast.LENGTH_LONG).show();
-			isConnected = false;
-		}
-		 return isConnected;
 	}
 }
 	

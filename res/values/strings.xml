@@ -9,5 +9,6 @@
     <string name="title_activity_connect_to_pc">ConnectToPC</string>
     <string name="title_activity_bluetooth_message">BluetoothMessage</string>
     <string name="title_activity_start">Start</string>
+    <string name="whatIsYourNameText">Hello, what is your name?</string>
 
 </resources>

@@ -89,6 +89,7 @@ public final class R {
         public static final int title_activity_connect_to_robot=0x7f050004;
         public static final int title_activity_main_menu=0x7f050003;
         public static final int title_activity_start=0x7f050007;
+        public static final int whatIsYourNameText=0x7f050008;
     }
     public static final class style {
         /** 

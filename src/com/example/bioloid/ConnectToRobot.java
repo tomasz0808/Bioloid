@@ -9,13 +9,17 @@ import java.net.Socket;
 import java.util.Set;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.view.ContextMenu;
@@ -29,7 +33,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -56,21 +59,11 @@ public class ConnectToRobot extends Activity {
 	private Socket testSocket;
 	private Intent startIntent;
 	
-	
-	
 	private Switch bluetoothSwitch;
 	private TextView switchStatus;
 
 	int position;
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	
@@ -78,7 +71,9 @@ public class ConnectToRobot extends Activity {
 	private TextView deviceFoundTextView;
 	private TextView devicePairedTextView;
 	private Button searchButton;
-	
+	private boolean tutorialStart;
+	private SharedPreferences sharedPreferences;
+	private Editor editor;
 	
 	
 	
@@ -90,40 +85,10 @@ public class ConnectToRobot extends Activity {
 		setContentView(R.layout.activity_connect_to_robot);	
 		deviceFoundTextView = (TextView)findViewById(R.id.deviceFound);
 		devicePairedTextView = (TextView)findViewById(R.id.devicePaired);
-		startIntent = new Intent(getApplicationContext(), Start.class);
-			
+		startIntent = new Intent(getApplicationContext(), Start.class);		
 		speekIntent = new Intent(getApplicationContext(), Speek.class);
-//		testSocket = ConnectToPC.socketOut;
-//		isConnected = ConnectToPC.isConnected;
-//		try {
-//			PCoutputStream = new DataOutputStream(testSocket.getOutputStream());
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		
-//		testText = (EditText)findViewById(R.id.serverIpAddress);
-//		testButton = (Button)findViewById(R.id.connectToServerButton);
-//		testButton.setOnClickListener(new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				
-//				if(isConnected){
-//					try {
-//						PCoutputStream.writeUTF(testText.getText().toString());
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//				
-//			}
-//		});
-		
-		
-		
-		
+		sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
+		editor 		= sharedPreferences.edit();
 		
 		bluetoothSwitch = (Switch)findViewById(R.id.bluetoothOnOffSwitch);
 		switchStatus = (TextView)findViewById(R.id.connectToPCText);
@@ -156,16 +121,45 @@ public class ConnectToRobot extends Activity {
 
 			
 		});	
-		
+		final AlertDialog.Builder builder1 = new AlertDialog.Builder(ConnectToRobot.this);
+        builder1.setMessage("Do you want to start tutorial? \n It's recomended for first time.");
+        builder1.setCancelable(true);
+        builder1.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            	tutorialStart = true;
+            	editor.putBoolean("TUTORIAL_START", tutorialStart);
+				editor.commit();
+				startActivity(startIntent);
+            	dialog.cancel();
+            	
+            }
+        });
+        builder1.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            	tutorialStart = false;
+            	editor.putBoolean("TUTORIAL_START", tutorialStart);
+				editor.commit();
+				startActivity(startIntent);
+            	dialog.cancel();
+            	
+            }
+        });
+
 
 		searchButton.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				if(searchButton.getText().toString().equalsIgnoreCase("Search")){
-				startBT();	
-				} else{
-				startActivity(startIntent);
-				}
+				AlertDialog alert11 = builder1.create();
+	            alert11.show();
+				
+				//zakomentowane do robienia apki zeby nie ³¹czyc sie za kazdym razem z robotem!!!
+//				if(searchButton.getText().toString().equalsIgnoreCase("Search")){
+//				startBT();	
+//				} else{
+				
+//				}
 			}
 		});		
 	}
@@ -394,4 +388,5 @@ public class ConnectToRobot extends Activity {
 		 public static synchronized BluetoothSocket getSocket(){
 		        return socket;
 		    }
+
 }

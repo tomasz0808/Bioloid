@@ -28,7 +28,6 @@
         android:layout_alignLeft="@+id/deviceFound"
         android:layout_below="@+id/deviceFound"
         android:layout_marginTop="56dp"
-        android:paddingBottom="4dip"
-        android:text="Click the button and start speaking" />
+        android:paddingBottom="4dip" />
 
 </RelativeLayout>

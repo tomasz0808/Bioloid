@@ -30,10 +30,13 @@ public class SpechRecognition extends Service
 	protected boolean mIsListening;
 	protected volatile boolean mIsCountDownOn;
 	private static boolean mIsStreamSolo;
+	public static boolean isSpeechRecognized;
 
 	static final int MSG_RECOGNIZER_START_LISTENING = 1;
 	static final int MSG_RECOGNIZER_CANCEL = 2;
 	private static final String TAG = null;
+	
+	final static String MY_ACTION = "MY_ACTION";
 
 	@Override
 	public void onCreate()
@@ -236,11 +239,21 @@ public class SpechRecognition extends Service
 	    {
 	    	ArrayList<String> answer = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 	    	Start.methodText.setText("onResults");
-
+	    	Intent intent = new Intent();
+	    	intent.setAction(MY_ACTION);	        
+	        intent.putExtra("DATAPASSED", answer.get(0));	       
+	        sendBroadcast(intent);
+	    	
 	        Start.resultsText.setText(answer.get(0));
+//	        Start.sendTextRecognized(answer.get(0));
 	        mIsListening = false;
 	        Start.sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 	    }
+//	    public static String waitForRespond(String recognizedText)
+//		{
+//		 return	recognizedText;
+//			
+//		}
 
 	    @Override
 	    public void onRmsChanged(float rmsdB)
