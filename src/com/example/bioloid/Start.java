@@ -66,17 +66,16 @@ public class Start extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.activity_start);
-	    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);   
+	    setContentView(R.layout.activity_start);  
 	    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	    setBackground("angry");
 	    datapassedaaaa = "";
 	    speekService = new Intent(getApplicationContext(), Speek.class);
 	    recognizeSpeechService = new Intent(getApplicationContext(), SpechRecognition.class);
-	    startService(recognizeSpeechService);
+
 	    conversation = new ConversationThread();
 	    sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
-//	    editor = sharedPreferences.edit();
+
 	    intervalTime = sharedPreferences.getInt("INTERVAL_TIME", 15);
 	    lostConnection = sharedPreferences.getBoolean("LOST_CONNECTION", false);
 	    tutorialStart = sharedPreferences.getBoolean("TUTORIAL_START", false);
@@ -98,9 +97,7 @@ public class Start extends Activity {
 	    methodText 	= (TextView) findViewById(R.id.deviceFound);
 	    resultsText = (TextView) findViewById(R.id.TextView2);
 	    mBindFlag = Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH ? 0 : Context.BIND_ABOVE_CLIENT;
-	    speekService = new Intent(getApplicationContext(), Speek.class);
-	    recognizeSpeechService = new Intent(getApplicationContext(), SpechRecognition.class);
-	    startService(recognizeSpeechService);
+	 
 	  
 	    myReceiver = new MyReceiver();
 	    IntentFilter intentFilter = new IntentFilter();
@@ -114,16 +111,16 @@ public class Start extends Activity {
 
 
 	public void sayText(String say){
+//		stopService(speekService);
 		speekService.putExtra("Text", say);																	
 		startService(speekService);
-		say = "";
 	}
 	
 	public void sayTextFromResources(String s){
 		int getResID = getResources().getIdentifier(s, "string", getPackageName());
 		String say = getString(getResID);
-		speekService.putExtra("Text", say);																	
-		startService(speekService);
+//		speekService.putExtra("Text", say);																	
+//		startService(speekService);
 	}
 	
 	public void setBackground(String string) {
@@ -137,8 +134,8 @@ public class Start extends Activity {
 	protected void onStart() {
 		 
 	    super.onStart();
-	    speekService = new Intent(getApplicationContext(), Speek.class);
-	    recognizeSpeechService = new Intent(getApplicationContext(), SpechRecognition.class);
+	    speekService.putExtra("Text", "");
+	    startService(speekService);	    
 	    startService(recognizeSpeechService);
 	    conversation.start();
 	    
@@ -151,6 +148,7 @@ public class Start extends Activity {
 	protected void onStop()
 	{
 	    super.onStop();
+	    
 	    unregisterReceiver(myReceiver);
 	    
 	    if (mServiceMessenger != null)
@@ -191,8 +189,8 @@ public class Start extends Activity {
 	protected void onDestroy(){
 	    super.onDestroy();
 	    threadStop = true;
-	    stopService(recognizeSpeechService);
-	    stopService(speekService);
+//	    stopService(recognizeSpeechService);
+//	    stopService(speekService);
 
 	}
 	
@@ -204,7 +202,18 @@ public class Start extends Activity {
 	public void waitThread() throws InterruptedException{
 		conversation.wait();
 	}
-
+	  public void waitForUser(){
+		  
+		  synchronized (datapassedaaaa) {
+				try {
+					datapassedaaaa.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+		  
+		  }
+		  }
 	
 	
 	private class MyReceiver extends BroadcastReceiver{
@@ -230,7 +239,7 @@ public class Start extends Activity {
 //		    nm.no
 		  
 		  
-		  
+	
 		  
 		  
 		  if(datapassed.equalsIgnoreCase("yes")){
@@ -269,35 +278,14 @@ public class Start extends Activity {
 			// TODO Auto-generated method stub
 			super.run();
 			while(!threadStop){
-			sayText("Thread started");
-			try {
-				synchronized (datapassedaaaa) {
-					datapassedaaaa.wait();	
-				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-				sayText("Thread started again");
-			
+				sayText("start onew");
+				waitForUser();
+				sayText("start two after");
+				waitForUser();
 			}
-			
-			
 
-			
-			
-//			setBackground("happy");
-//			try {
-//				wait();
-//			} catch (InterruptedException e) {
-//				 TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			sayText("notification received");
-			
+		
 		}
-		
-		
 		
 	}
 

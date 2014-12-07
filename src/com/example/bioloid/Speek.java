@@ -12,6 +12,8 @@ public class Speek extends Service implements OnInitListener {
 
 	private TextToSpeech textToSpeech;
 	private String str;
+	
+	
 
 	
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -47,6 +49,8 @@ public class Speek extends Service implements OnInitListener {
         }
 		super.onDestroy();
 	}
+
+
 
 	@SuppressWarnings("deprecation")
 	private void sayHello(String str) {

@@ -86,7 +86,7 @@ public class ConnectToRobot extends Activity {
 		deviceFoundTextView = (TextView)findViewById(R.id.deviceFound);
 		devicePairedTextView = (TextView)findViewById(R.id.devicePaired);
 		startIntent = new Intent(getApplicationContext(), Start.class);		
-		speekIntent = new Intent(getApplicationContext(), Speek.class);
+//		speekIntent = new Intent(getApplicationContext(), Speek.class);
 		sharedPreferences = getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
 		editor 		= sharedPreferences.edit();
 		
@@ -242,9 +242,9 @@ public class ConnectToRobot extends Activity {
 	}
 	private void initConnection()
 	{		
-		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
+//		speekIntent.putExtra("Text", "Hello, you have connected succesfully");
 		searchButton.setText("Start");		
-		startService(speekIntent);
+//		startService(speekIntent);
 	}
 	
 	 public synchronized static byte[] sendMessageToRobot(int i)

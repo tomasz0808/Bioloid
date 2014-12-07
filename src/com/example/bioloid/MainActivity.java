@@ -23,9 +23,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);			
         createToast(true);
-//		final Intent aaa = new Intent(getApplicationContext(), Speek.class);		
-//		aaa.putExtra(null, "Hello");
-//		startService(aaa);
     }	
 	
 	private void createToast(boolean show ) {
