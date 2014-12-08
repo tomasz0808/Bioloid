@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Random;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -34,6 +35,7 @@ public class Start extends Activity {
 	
 	
 	public Socket pcSocket;
+//	public BluetoothSocket btSocket;
 	public DataOutputStream pcOutput;
 	
 	
@@ -100,13 +102,14 @@ public class Start extends Activity {
 	    tutorialThread 		= new TutorialThread();
 		
 	    pcSocket 			= ConnectToPC.socketOut;
-	    	if(pcSocket !=null && pcSocket.isConnected()){
-	    		try {
-	    			pcOutput = new DataOutputStream(pcSocket.getOutputStream());
-	    			isConnectedToPC = true;
-	    		} catch (IOException e) {
-	    			e.printStackTrace();
-	    		}
+	    
+	    if(pcSocket !=null && pcSocket.isConnected()){
+	    	try {
+	    		pcOutput = new DataOutputStream(pcSocket.getOutputStream());
+	    		isConnectedToPC = true;
+	    	} catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
 	    }
 	    
 	    
@@ -125,7 +128,6 @@ public class Start extends Activity {
 	}
 
 	public void sayText(String say){
-//		while(speekService.getAction().isEmpty())
 		speekService.putExtra("Text", say);																	
 		startService(speekService);
 	}
@@ -148,7 +150,6 @@ public class Start extends Activity {
 	}
 	
 	public void setBackground(String string) {
-		// TODO Auto-generated method stub
 		int resourceId= getResources().getIdentifier(string, "drawable", getPackageName());
 		getWindow().setBackgroundDrawableResource(resourceId);
 		
@@ -165,22 +166,15 @@ public class Start extends Activity {
 //	    speekService.putExtra("Text", "");
 //	    startService(speekService);	    
 	    startService(recognizeSpeechService);
-	   
-	    
-
-
 	    bindService(new Intent(this, SpechRecognition.class), mServiceConnection, mBindFlag);
 	}
 
 	@Override
 	protected void onStop()
 	{
-	    super.onStop();
-	    
-	    unregisterReceiver(myReceiver);
-	    
-	    if (mServiceMessenger != null)
-	    {
+	    super.onStop();	    
+	    unregisterReceiver(myReceiver);	    
+	    if (mServiceMessenger != null){
 	        unbindService(mServiceConnection);
 	        mServiceMessenger = null;
 	    }
@@ -199,7 +193,7 @@ public class Start extends Activity {
 	        if (DEBUG) {Log.d(TAG, "onServiceDisconnected");} //$NON-NLS-1$
 	        	mServiceMessenger = null;
 	    }
-	}; // mServiceConnection
+	}; 
 
 	public static void sendMessage(int type){
 	     Message msg = new Message();
@@ -217,8 +211,8 @@ public class Start extends Activity {
 	protected void onDestroy(){
 	    super.onDestroy();
 	    threadStop = true;
-//	    stopService(recognizeSpeechService);
-//	    stopService(speekService);
+	    stopService(recognizeSpeechService);
+	    stopService(speekService);
 
 	}
 	
@@ -262,6 +256,13 @@ public class Start extends Activity {
 		  
 	}
 	
+	public boolean ifYes(String string){
+		return string.contains("yes");
+	}
+	public boolean ifNo(String string){
+		return string.contains("no");
+	}
+	
 	
 	private class MyReceiver extends BroadcastReceiver{
 		 
@@ -303,19 +304,19 @@ public class Start extends Activity {
 	}
 	private class TutorialThread extends Thread
 	{
+		boolean nameRecognized = false;
 		String name;
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
 			super.run();
 			try {
 				Thread.sleep(2000);
+				sayText("Hello");
+				waitForTTStoFinish();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-//			while(!threadStop){
-				sayTextFromResourcesRandom("whatIsYourNameText", 4);
+			while(!nameRecognized){
+				sayTextFromResourcesRandom("whatIsYourNameText", 5);
 				waitForTtsAndUser();
 				sayTextFromResourcesRandom("confirmName", 3);
 				waitForTTStoFinish();
@@ -323,29 +324,20 @@ public class Start extends Activity {
 				name = datapassed;
 				waitForTtsAndUser();
 				if(ifYes(datapassed)){
+					nameRecognized = true;
 					editor.putString("USER_NAME", name);
-					editor.commit();
-				  }else{
-					  conversationThread.start();
-				  }
-			
+					editor.commit();				
+				}
+			}			
 				sayText("Ok, "+name);
 				waitForTTStoFinish();
 				sayTextFromResources("tutorialText");
 				waitForTTStoFinish();
 				sayText(String.valueOf(intervalTime)+",minutes");
-				
-//			}
 		}
 		
-	public boolean ifYes(String string){
-		return string.contains("yes");
-	}
-	public boolean ifNo(String string){
-		return string.contains("no");
-	}
-	
-	
+
+		
 	}
 
 }

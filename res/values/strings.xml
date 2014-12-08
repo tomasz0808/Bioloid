@@ -9,13 +9,18 @@
     <string name="title_activity_connect_to_pc">ConnectToPC</string>
     <string name="title_activity_bluetooth_message">BluetoothMessage</string>
     <string name="title_activity_start">Start</string>
-    <string name="whatIsYourNameText0">Hello, what is your name?</string>
-    <string name="whatIsYourNameText1">Hi, what is your name?</string>
-    <string name="whatIsYourNameText2">Hi, how should I call you?</string>
-    <string name="whatIsYourNameText3">Hello, how would you like me to call you</string>
+    <string name="whatIsYourNameText0">what is your name?</string>
+    <string name="whatIsYourNameText1">what is your name?</string>
+    <string name="whatIsYourNameText2">how should I call you?</string>
+    <string name="whatIsYourNameText3">how would you like me to call you</string>
+    <string name="whatIsYourNameText4">Could you tell me your name?</string>
     <string name="confirmName0">Is it</string>
     <string name="confirmName1">Did you say</string>
     <string name="confirmName2">Did I hear</string>
+    <string name="askNameAgain0">Did I hear</string>
+    <string name="askNameAgain1">Did I hear</string>
+    <string name="askNameAgain2">Did I hear</string>
+    
     <string name="tutorialText">Before we begin, you should know that I can only respond to yes, no, and help, in case of emergency. Please speak slowly and clearly so I can understand.. I will check on you every</string>
 
 </resources>
