@@ -15,5 +15,7 @@
     <string name="whatIsYourNameText3">Hello, how would you like me to call you</string>
     <string name="confirmName0">Is it</string>
     <string name="confirmName1">Did you say</string>
+    <string name="confirmName2">Did I hear</string>
+    <string name="tutorialText">Before we begin, you should know that I can only respond to yes, no, and help, in case of emergency. Please speak slowly and clearly so I can understand.. I will check on you every</string>
 
 </resources>

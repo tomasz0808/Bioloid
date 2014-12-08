@@ -85,12 +85,14 @@ public final class R {
         public static final int app_name=0x7f050000;
         public static final int confirmName0=0x7f05000c;
         public static final int confirmName1=0x7f05000d;
+        public static final int confirmName2=0x7f05000e;
         public static final int hello_world=0x7f050001;
         public static final int title_activity_bluetooth_message=0x7f050006;
         public static final int title_activity_connect_to_pc=0x7f050005;
         public static final int title_activity_connect_to_robot=0x7f050004;
         public static final int title_activity_main_menu=0x7f050003;
         public static final int title_activity_start=0x7f050007;
+        public static final int tutorialText=0x7f05000f;
         public static final int whatIsYourNameText0=0x7f050008;
         public static final int whatIsYourNameText1=0x7f050009;
         public static final int whatIsYourNameText2=0x7f05000a;

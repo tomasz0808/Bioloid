@@ -66,6 +66,7 @@ public class Start extends Activity {
 	public String datapassed;
 	public String stringForWaitUser;
 	public static String waitForTTStoFinishString;
+	public static String waitForTTSandUser;
 	public 	int intervalTime;
 	private int mBindFlag;
 	
@@ -82,15 +83,15 @@ public class Start extends Activity {
 	    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	    setBackground("angry");
 	    stringForWaitUser = "";
+	    waitForTTSandUser = "";
 	    waitForTTStoFinishString = "";
 	    rand = new Random();
 	    speekService = new Intent(getApplicationContext(), Speek.class);
-	    recognizeSpeechService = new Intent(getApplicationContext(), SpechRecognition.class);
-
-	    
+	    recognizeSpeechService = new Intent(getApplicationContext(), SpechRecognition.class);   
 	    
 	    	    	    
 	    sharedPreferences 	= getApplicationContext().getSharedPreferences("ConnectToPCSharedPrefs", MODE_PRIVATE);
+	    editor 				= sharedPreferences.edit();
 	    intervalTime 		= sharedPreferences.getInt("INTERVAL_TIME", 15);
 	    lostConnection 		= sharedPreferences.getBoolean("LOST_CONNECTION", false);
 	    tutorialStart 		= sharedPreferences.getBoolean("TUTORIAL_START", false);
@@ -129,11 +130,11 @@ public class Start extends Activity {
 		startService(speekService);
 	}
 	
-	public void sayTextFromResources(String s){
-		int getResID = getResources().getIdentifier(s, "string", getPackageName());
-		String say = getString(getResID);
-//		speekService.putExtra("Text", say);																	
-//		startService(speekService);
+	public void sayTextFromResources(String say){
+		int getResID = getResources().getIdentifier(say, "string", getPackageName());
+		say = getString(getResID);
+		speekService.putExtra("Text", say);																	
+		startService(speekService);
 	}
 	public void sayTextFromResourcesRandom(String say, int range){
 		StringBuilder sb = new StringBuilder (String.valueOf(say));
@@ -227,22 +228,33 @@ public class Start extends Activity {
 	}
 	
 	
-	public void waitForUser(){	  
-		
-		  synchronized (stringForWaitUser) {
-				try {
-					stringForWaitUser.wait();
-					waitForTTStoFinishString.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				
-		  }
-	}
+//	public void waitForUser(){	  
+//		sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
+//		  synchronized (stringForWaitUser) {
+//				try {
+//					stringForWaitUser.wait();
+//					
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//				
+//		  }
+//	}
 	public void waitForTTStoFinish(){	  
 		synchronized (waitForTTStoFinishString) {
 			try {
 				waitForTTStoFinishString.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		  
+	}
+	public void waitForTtsAndUser(){	  
+		synchronized (waitForTTStoFinishString) {
+			try {
+				waitForTTStoFinishString.wait();
+				stringForWaitUser.wait();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -257,42 +269,12 @@ public class Start extends Activity {
 		 public void onReceive(Context arg0, Intent arg1) {
 		  // TODO Auto-generated method stub
 		  
-		  datapassed = arg1.getStringExtra("DATAPASSED");		  
+		  datapassed = arg1.getStringExtra("DATAPASSED");
+		  if(!datapassed.equalsIgnoreCase(""))
 			  synchronized (stringForWaitUser) {
 				  stringForWaitUser.notify();
 			}
 		  
-//		  if(datapassed.equalsIgnoreCase("yes")){
-//			  isFinished = true;
-//			 
-//		  
-//		 }else if(datapassed.equalsIgnoreCase("normal")){
-//			 setBackground("normal");
-//		 }else if(datapassed.equalsIgnoreCase("angry")){
-//			 setBackground("normal");
-//		 }else if(datapassed.equalsIgnoreCase("happy")){
-//			 setBackground("happy");
-//		 }else if(datapassed.equalsIgnoreCase("sad")){
-//			 setBackground("sad");
-//		 }else if(datapassed.equalsIgnoreCase("fuck you")){
-//			 sayText("Fuck you too !");
-//		 }else if(datapassed.equalsIgnoreCase("sleep")){
-//			 sayText("I'm going to sleep");			
-//		 }
-			  
-			  
-			  
-			  
-//		 else if(datapassed.equalsIgnoreCase("help") && isConnectedToPC){
-//			 try {
-//				pcOutput.writeUTF("Help");
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-			 
-			
-//		 }
 		 }}
 	private class ConversationThread extends Thread
 	{
@@ -302,36 +284,26 @@ public class Start extends Activity {
 			// TODO Auto-generated method stub
 			super.run();
 			while(!threadStop){
-				
-				
-				
-				
-				
-				sayText("Conversation");
-				waitForUser();
-				if(ifYes()){
-					sayText("said yes");
-					waitForUser();}
-				else if(ifNo()){
-					sayText("said no");
-					waitForUser();}
-				else{
-					sayText("said something else");
-					waitForUser();
-				}
+			sayText("Conversation");
+//				waitForUser();
+//				if(ifYes()){
+//					sayText("said yes");
+//					waitForUser();}
+//				else if(ifNo()){
+//					sayText("said no");
+//					waitForUser();}
+//				else{
+//					sayText("said something else");
+//					waitForUser();
+//				}
 			}
 
 		
 		}
-		public boolean ifYes(){
-			return datapassed.equalsIgnoreCase("yes");
-		}
-		public boolean ifNo(){
-			return datapassed.equalsIgnoreCase("no");
-		}
 	}
 	private class TutorialThread extends Thread
 	{
+		String name;
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
@@ -344,13 +316,45 @@ public class Start extends Activity {
 			}
 //			while(!threadStop){
 				sayTextFromResourcesRandom("whatIsYourNameText", 4);
-				waitForUser();
-				sayTextFromResourcesRandom("confirmName", 2);
+				waitForTtsAndUser();
+				sayTextFromResourcesRandom("confirmName", 3);
 				waitForTTStoFinish();
 				sayText(datapassed);
+				name = datapassed;
+				waitForTtsAndUser();
+				if(ifYes(datapassed)){
+					editor.putString("USER_NAME", name);
+					editor.commit();
+				  }else{
+					  conversationThread.start();
+				  }
+			
+				sayText("Ok, "+name);
+				waitForTTStoFinish();
+				sayTextFromResources("tutorialText");
+				waitForTTStoFinish();
+				sayText(String.valueOf(intervalTime)+",minutes");
 				
 //			}
 		}
+		
+	public boolean ifYes(String string){
+		return string.contains("yes");
+	}
+	public boolean ifNo(String string){
+		return string.contains("no");
+	}
+	
+	
 	}
 
 }
+
+
+
+
+
+
+
+
+

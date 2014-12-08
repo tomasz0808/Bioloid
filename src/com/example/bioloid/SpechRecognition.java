@@ -247,7 +247,7 @@ public class SpechRecognition extends Service
 	        Start.resultsText.setText(answer.get(0));
 //	        Start.sendTextRecognized(answer.get(0));
 	        mIsListening = false;
-	        Start.sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
+//	        Start.sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 	    }
 //	    public static String waitForRespond(String recognizedText)
 //		{
