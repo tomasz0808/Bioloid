@@ -21,6 +21,6 @@
     <string name="askNameAgain1">Did I hear</string>
     <string name="askNameAgain2">Did I hear</string>
     
-    <string name="tutorialText">Before we begin, you should know that I can only respond to yes, no, and help, in case of emergency. Please speak slowly and clearly so I can understand.. I will check on you every</string>
+    <string name="tutorialText">Before we begin, you should know that I can only respond to yes, no, and help, in case of emergency. Please speak slowly and clearly so I can understand..</string>
 
 </resources>
