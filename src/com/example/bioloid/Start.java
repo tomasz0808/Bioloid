@@ -103,7 +103,7 @@ public class Start extends Activity {
 		sleepThread = new SleepThread();
 
 		// sleepTimeInMS = intervalTime*60*1000;
-		sleepTimeInMS = 10000*2;
+		sleepTimeInMS = 10000;
 
 		methodText = (TextView) findViewById(R.id.deviceFound);
 		resultsText = (TextView) findViewById(R.id.TextView2);
@@ -240,18 +240,6 @@ public class Start extends Activity {
 		return isLost;
 	}
 
-	// public void waitForUser(){
-	// sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
-	// synchronized (stringForWaitUser) {
-	// try {
-	// stringForWaitUser.wait();
-	//
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	// }
 	public void waitForTTStoFinish() {
 		synchronized (waitForTTStoFinishString) {
 			try {
@@ -289,9 +277,9 @@ public class Start extends Activity {
 
 	public int ifAnswer(String string) {
 		int b;
-		if(string.contains("yes")){
+		if(string.toLowerCase().contains("yes")){
 			b=1;
-		}else if (string.contains("no"))
+		}else if (string.toLowerCase().contains("no"))
 		{
 			b=2;
 		}else{
@@ -301,11 +289,11 @@ public class Start extends Activity {
 	}
 
 	public boolean ifWakeUp(String string) {
-		return string.contains("wake up");
+		return string.toLowerCase().contains("wake up");
 	}
 
 	public boolean ifHelp(String string) {
-		return string.contains("help");
+		return string.toLowerCase().contains("help");
 	}
 
 	private class MyReceiver extends BroadcastReceiver {
@@ -316,15 +304,16 @@ public class Start extends Activity {
 
 			datapassed = arg1.getStringExtra("DATAPASSED");
 			if (!datapassed.equalsIgnoreCase("")) {
-				if (helpConversation == true | normalConversation == true) {
 					synchronized (stringForWaitUser) {
 						stringForWaitUser.notify();
+						sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 					}
-				} else {
-					sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
-				}
-			}else if (datapassed.contains("Help")||datapassed.contains("wake up")){
-				sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
+					
+//				} else {
+////					sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
+//				}
+//			}else if (datapassed.contains("Help")||datapassed.contains("wake up")){
+//				sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 				}
 
 		}
@@ -332,6 +321,15 @@ public class Start extends Activity {
 
 	private class TutorialThread extends Thread {
 		boolean nameRecognized = false;
+		
+		
+		
+		boolean step1 = true;
+		boolean step2 = false;
+		boolean step3 = false;
+//		boolean step4 = false;
+		boolean conEnd = false;
+		
 		@Override
 		public void run() {
 
@@ -350,6 +348,7 @@ public class Start extends Activity {
 			}		
 			sayText("Hello");
 			waitForTTStoFinish();
+			
 			while (!nameRecognized) {
 				sayTextFromResourcesRandom("whatIsYourNameText", 5);
 				waitForTtsAndUser();
@@ -365,7 +364,7 @@ public class Start extends Activity {
 					sendToPC("Patient name: " + name + ". Interval set to: " + intervalTime + " minutes.");
 				}
 			}
-			sayText("Ok, " + name);
+			sayText("Ok, ");
 			waitForTTStoFinish();
 			if (tutorialStart) {
 				sayTextFromResources("tutorialText");
@@ -389,75 +388,105 @@ public class Start extends Activity {
 		@Override
 		public void run() {
 			super.run();
+			normalConversation = false;
+			
+			sayText("Sleep Thred");
+			waitForTTStoFinish();
 			sendToPC("sleep");
 			sendToPC("Robot went to sleep mode for " + intervalTime + " minutes.");
-			while (!helpConversation && !normalConversation) {
+			while (helpConversation==false && normalConversation==false) {
 				if (ifHelp(datapassed)) {				
 					helpConversation = true;
-					conversationHelpThread.start();
+					new conversationHelpThread().start();				
 					sendToPC("Alert: Patient said help. Checking his status");
 				}else if(ifWakeUp(datapassed)){
 					sendToPC("Robot has been normally woken up by patient");
-					normalConversation=true;
-					conversationNormalThread.start();	
+					normalConversation = true;
+					new conversationNormalThread().start();	
 					sendToPC("Robot woke up after sleep time. Checking patient status");
 				}
-
 			}
-			if(sleepEnd){
-			conversationNormalThread.start();
+			if(sleepEnd==true){
+			poHelpie = false;
+			new conversationNormalThread().start();			
 			}
-			
 		}
 	}
 
-	private class conversationHelpThread extends Thread {		
-		
-		boolean conversationGoingOn=true;
-		boolean Step1=false;
-		boolean Step2=false;
-		boolean Step3=false;
-		
+	private class conversationHelpThread extends Thread {				
 		@Override
 		public void run() {
-			
 			super.run();
-			while(conversationGoingOn){
-			if(Step1==false)
-			{
-				sayText("Are you ok?");
-				waitForTtsAndUser();
-				if (ifAnswer(datapassed)==1) {
-					
+			
+			boolean step1 = true;
+			boolean step2 = false;
+			boolean step3 = false;
+//			boolean step4 = false;
+			boolean conEnd = false;
+			
+			sayText("Help Thread...Value is"+conEnd);
+			waitForTTStoFinish();
+			
+			while(conEnd == false){
+				
+				while(step1 == true){
+					sayText("Are you ok Help Thread?");
+					waitForTtsAndUser();
+					if (ifAnswer(datapassed)==1) {					
+						step1=false;
+						step2=true;
+					}else if(ifAnswer(datapassed)==2){
+						sendToPC("Alert: Nurse required immediately");
+						sayText("Please stay calm"+name+". Nurse will be here in a blink of an eye");
+						waitForTTStoFinish();
+						step1=false;
+						conEnd = true;					
+					}else{}
+				}
+				while(step2 == true){
 					sayText("I've heared someone saying help. Are you sure you're allright? ");
 					waitForTtsAndUser();
 					if (ifAnswer(datapassed)==2) {;
-						sendToPC("Alert: Nurse required immediately");
-						sayText("Nurse has been informed. She'll be in a minute");
-						waitForTTStoFinish();
+						
+					step2 = false;
+					step3 = true;
 					}else if(ifAnswer(datapassed)==1){
 						sendToPC("False alarm, patient is ok");
 						sayText("I've informed that you are ok.");
 						waitForTTStoFinish();
-					}
-				}else if(ifAnswer(datapassed)==2){
-					sendToPC("Alert: Nurse required immediately");
-					sayText("Please stay calm"+name+". Nurse will be here in a blink of an eye");
-					waitForTTStoFinish();
+						step2=false;
+						conEnd=true;
+					}else{}
 				}
+				while(step3 == true){
+					sendToPC("Alert: Nurse required immediately");
+					sayText("Nurse has been informed. She'll be in a minute");
+					waitForTTStoFinish();
+					step3 = false;
+					conEnd = true;										
+				}			
 			}
-		}
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e) {
-			}
-			sayText("Ok, I'm going to sleep now");
-			conversationNormalThread.start();
-			poHelpie=true;
+//					try {
+//						Thread.sleep(10000);
+//					} catch (InterruptedException e) {
+//					}
+					sayText("Ok, I'm going to sleep now");
+					
+					helpConversation = false;
+					new SleepThread().start();
+//					poHelpie=false;
+			
 		}
 	}
 			
 	private class conversationNormalThread extends Thread {
+		
+
+		boolean step1= true;
+		boolean step2= false;
+		boolean step3 =false;
+		boolean step4 =false;
+		boolean conEnd = false;
 		@Override
 		public void run() {	
 			
@@ -465,19 +494,56 @@ public class Start extends Activity {
 				
 			super.run();
 			sleepEnd = false;
-
-			sayText("Do you feel good,"+name+", ?");
-			waitForTtsAndUser();			
-			if(ifAnswer(datapassed)== 1){
-				sayText("Do you need something?");
-				waitForTtsAndUser();
-				if(ifAnswer(datapassed) == 1){
-					sayText("Should I call nurse?");
-					waitForTtsAndUser();		
-					if(ifAnswer(datapassed)==1){
-						sendToPC("Request: Patient need assistant");
+			while(conEnd == false)
+			{
+				while(step1 == true)
+				{
+					sayText("Do you feel good "+name+" ?");
+					waitForTtsAndUser();	
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(ifAnswer(datapassed)== 1){
+						step2 = true;
+						step1 = false;
+					}
+					else if(ifAnswer(datapassed)==2){
+						sendToPC("Alert: Patient need assistant");
 						sayText("Nurse is on her way.");
 						waitForTTStoFinish();
+						step1 = false;
+						conEnd = true;
+					}
+					else{
+					}
+				}
+				while(step2 ==true)
+				{
+						sayText("Do you need something?");
+						waitForTtsAndUser();
+						if(ifAnswer(datapassed) == 1){
+							step3 =true;
+							step2 =false;
+						}
+						else if(ifAnswer(datapassed)==2){
+							sayText("Well, you don't need me now");
+							waitForTTStoFinish();
+							step2 =false;
+							conEnd = true;
+						}
+						else{
+						}
+				}
+				while(step3==true)
+				{
+					sayText("Should I call nurse?");
+					waitForTtsAndUser();
+					if(ifAnswer(datapassed)==1){
+						step4 = true;
+						step3 =false;
 					}
 					else if(ifAnswer(datapassed)==2){
 						sayText("Please tell me, what do you need");
@@ -485,34 +551,40 @@ public class Start extends Activity {
 						sendToPC("Request: "+ name + " needs "+ datapassed);
 						sayText("I informed nurse about your needs");
 						waitForTTStoFinish();
-					}	
-				}else if(ifAnswer(datapassed)==2){
-					sayText("Well, then you don't need me now");
+						step3 =false;
+						conEnd = true;
+					}
+					else{
+					}
+				}
+				while(step4==true)
+				{
+					sendToPC("Request: Patient need assistant");
+					sayText("Nurse is on her way.");
 					waitForTTStoFinish();
+					conEnd = true;
+					step4  = false;
+					break;
+					
 				}
-			} else if(ifAnswer(datapassed)==2){
-				sendToPC("Alert: Patient need assistant");
-				sayText("Nurse is on her way.");
-				waitForTTStoFinish();
-				}
-
-
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e1) {
-			}
-			
-			
-			sayText("Ok, I'm going to sleep now. See you in "+intervalTime+" minutes");			
-			waitForTTStoFinish();
 		}
-			sleepThread.start();
-			try {
+	} 
+			
+//		try {
+//				Thread.sleep(10000);
+//			} 
+//		catch (InterruptedException e1) {
+//			}
+		sayText("Ok, I'm going to sleep now. See you in "+intervalTime+" minutes");			
+		waitForTTStoFinish();
+		new SleepThread().start();	
+		try {
 				Thread.sleep(sleepTimeInMS);
-			} catch (InterruptedException e) {
+			} 
+		catch (InterruptedException e) {
 			}
-			sleepEnd = true;
-			normalConversation = true;
+		sleepEnd = true;
+		normalConversation = true;
 			
 		}
 
