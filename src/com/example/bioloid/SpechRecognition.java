@@ -43,7 +43,7 @@ public class SpechRecognition extends Service
 	{
 	    super.onCreate();
 
-	    mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE); 
+//	    mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE); 
 	    mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 	    mSpeechRecognizer.setRecognitionListener(new SpeechRecognitionListener());
 	    mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -74,15 +74,15 @@ public class SpechRecognition extends Service
 	        {
 	            case MSG_RECOGNIZER_START_LISTENING:
 
-	                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-	                {
+//	                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+//	                {
 	                    // turn off beep sound  
-	                    if (!mIsStreamSolo)
-	                    {
-	                        mAudioManager.setStreamSolo(AudioManager.STREAM_VOICE_CALL, true);
+//	                    if (!mIsStreamSolo)
+//	                    {
+//	                        mAudioManager.setStreamSolo(AudioManager.STREAM_VOICE_CALL, true);
 	                        mIsStreamSolo = true;
-	                    }
-	                }
+//	                    }
+//	                }
 	                 if (!target.mIsListening)
 	                 {
 	                     target.mSpeechRecognizer.startListening(target.mSpeechRecognizerIntent);
@@ -92,11 +92,11 @@ public class SpechRecognition extends Service
 	                 break;
 
 	             case MSG_RECOGNIZER_CANCEL:
-	                if (mIsStreamSolo)
-	               {
-	                    mAudioManager.setStreamSolo(AudioManager.STREAM_VOICE_CALL, false);
-	                    mIsStreamSolo = false;
-	               }
+//	                if (mIsStreamSolo)
+//	               {
+//	                    mAudioManager.setStreamSolo(AudioManager.STREAM_VOICE_CALL, false);
+//	                    mIsStreamSolo = false;
+//	               }
 	                  target.mSpeechRecognizer.cancel();
 	                  target.mIsListening = false;
 	                  //Log.d(TAG, "message canceled recognizer"); //$NON-NLS-1$
@@ -164,11 +164,11 @@ public class SpechRecognition extends Service
 	    {
 	    	Start.methodText.setText("onBeginningOfSpeech");
 	        // speech input will be processed, so there is no need for count down anymore
-	        if (mIsCountDownOn)
-	        {
-	            mIsCountDownOn = false;
-	            mNoSpeechCountDown.cancel();
-	        }               
+//	        if (mIsCountDownOn)
+//	        {
+//	            mIsCountDownOn = false;
+//	            mNoSpeechCountDown.cancel();
+//	        }               
 	        //Log.d(TAG, "onBeginingOfSpeech"); //$NON-NLS-1$
 	    }
 

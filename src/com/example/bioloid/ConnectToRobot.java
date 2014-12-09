@@ -151,14 +151,14 @@ public class ConnectToRobot extends Activity {
 		searchButton.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				AlertDialog alert11 = builder1.create();
-	            alert11.show();
+				
 				
 				//zakomentowane do robienia apki zeby nie ³¹czyc sie za kazdym razem z robotem!!!
 //				if(searchButton.getText().toString().equalsIgnoreCase("Search")){
-//				startBT();	
+//					startBT();	
 //				} else{
-				
+					AlertDialog alert11 = builder1.create();
+		            alert11.show();
 //				}
 			}
 		});		
