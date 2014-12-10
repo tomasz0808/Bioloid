@@ -1,7 +1,9 @@
 package com.example.bioloid;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Random;
 
@@ -34,8 +36,10 @@ public class Start extends Activity {
 	private Editor editor;
 
 	public Socket pcSocket;
-	public BluetoothSocket btSocket;
+//	public BluetoothSocket btSocket;
+//	public static OutputStream btSend;
 	public static DataOutputStream pcOutput;
+	public static DataInputStream pcIn;
 
 	private Intent recognizeSpeechService;
 	private Intent speekService;
@@ -49,6 +53,7 @@ public class Start extends Activity {
 
 	protected static final boolean DEBUG = false;
 	public boolean conversationThreadStop = false;
+	public static boolean destroyAll=false;
 	public boolean isConnectedToPC = false;
 	public boolean lostConnection = false;
 	private boolean tutorialStart;
@@ -72,6 +77,7 @@ public class Start extends Activity {
 	public conversationHelpThread conversationHelpThread;
 	public SleepThread sleepThread;
 	public MonitorPCConnection monitorPcConnection;
+	public WakeUp wakeUp;
 	public conversationNormalThread conversationNormalThread;
 	public boolean poHelpie;
 
@@ -103,7 +109,7 @@ public class Start extends Activity {
 		sleepThread = new SleepThread();
 
 		// sleepTimeInMS = intervalTime*60*1000;
-		sleepTimeInMS = 10000;
+		sleepTimeInMS = 10000*5;
 
 		methodText = (TextView) findViewById(R.id.deviceFound);
 		resultsText = (TextView) findViewById(R.id.TextView2);
@@ -117,18 +123,23 @@ public class Start extends Activity {
 	}
 
 	public void sayText(String say) {
+		if(!destroyAll){
 		speekService.putExtra("Text", say);
 		startService(speekService);
+		}
 	}
 
 	public void sayTextFromResources(String say) {
+		if(!destroyAll){
 		int getResID = getResources().getIdentifier(say, "string", getPackageName());
 		say = getString(getResID);
 		speekService.putExtra("Text", say);
 		startService(speekService);
+		}
 	}
 
 	public void sayTextFromResourcesRandom(String say, int range) {
+		if(!destroyAll){
 		StringBuilder sb = new StringBuilder(String.valueOf(say));
 		sb.append(getRandom(range));
 		say = sb.toString();
@@ -137,6 +148,7 @@ public class Start extends Activity {
 		say = getString(getResID);
 		speekService.putExtra("Text", say);
 		startService(speekService);
+		}
 	}
 
 	public void setBackground(String string) {
@@ -148,10 +160,9 @@ public class Start extends Activity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-
+		destroyAll=false;
 		datapassed = "";
 		poHelpie = false;
-//		btSocket = ConnectToRobot.socket;
 		myReceiver = new MyReceiver();
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(SpechRecognition.MY_ACTION);
@@ -160,8 +171,10 @@ public class Start extends Activity {
 			try {
 				pcSocket = ConnectToPC.socketOut;
 				pcOutput = new DataOutputStream(pcSocket.getOutputStream());
+				pcIn = new DataInputStream(pcSocket.getInputStream());
 				sendToPC("wake");
 				monitorPcConnection = new MonitorPCConnection();
+				wakeUp = new WakeUp();
 				isConnectedToPC = true;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -169,6 +182,7 @@ public class Start extends Activity {
 		}
 		if (isConnectedToPC) {
 			monitorPcConnection.start();
+			wakeUp.start();
 		}
 		tutorialThread.start();
 
@@ -179,7 +193,12 @@ public class Start extends Activity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		unregisterReceiver(myReceiver);
+		try {
+			unregisterReceiver(myReceiver);
+		} catch (Exception e) {
+			
+		}
+		
 		if (mServiceMessenger != null) {
 			unbindService(mServiceConnection);
 			mServiceMessenger = null;
@@ -190,12 +209,31 @@ public class Start extends Activity {
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		super.onBackPressed();
-		tutorialThread.interrupt();
-		conversationHelpThread.interrupt();
-		sleepThread.interrupt();
-		monitorPcConnection.interrupt();
+		destroyAll = true;
+		
+		
+		onStop();		 
+		if(tutorialThread!=null){
+			if(tutorialThread.isAlive()){
+				tutorialThread.interrupt();}}
+		if(conversationHelpThread!=null){
+			if(conversationHelpThread.isAlive()){
+				conversationHelpThread.interrupt();}}
+		if(sleepThread!=null){
+			if(sleepThread.isAlive()){
+				sleepThread.interrupt();}}
+		if(monitorPcConnection!=null){
+			if(monitorPcConnection.isAlive()){
+				monitorPcConnection.interrupt();}}
+		if(wakeUp!=null){
+			if(wakeUp.isAlive()){
+				wakeUp.interrupt();}}
+		if(conversationNormalThread!=null){
+			if(conversationNormalThread.isAlive()){
+				conversationNormalThread.interrupt();}}
 		onDestroy();
 	}
+
 
 	private final ServiceConnection mServiceConnection = new ServiceConnection() {
 		@Override
@@ -215,6 +253,7 @@ public class Start extends Activity {
 	};
 
 	public static void sendMessage(int type) {
+		if(!destroyAll){
 		Message msg = new Message();
 		msg.what = type;
 		try {
@@ -222,16 +261,17 @@ public class Start extends Activity {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
+		}
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		isAppRunning = false;
 		conversationThreadStop = true;
 		lostConnection = true;
 		stopService(recognizeSpeechService);
 		stopService(speekService);
+		
 
 	}
 
@@ -241,6 +281,7 @@ public class Start extends Activity {
 	}
 
 	public void waitForTTStoFinish() {
+		if(!destroyAll){
 		synchronized (waitForTTStoFinishString) {
 			try {
 				waitForTTStoFinishString.wait();
@@ -248,10 +289,12 @@ public class Start extends Activity {
 				e.printStackTrace();
 			}
 		}
+		}
 
 	}
 
 	public void waitForTtsAndUser() {
+		if(!destroyAll){
 		synchronized (waitForTTStoFinishString) {
 			try {
 				waitForTTStoFinishString.wait();
@@ -260,10 +303,12 @@ public class Start extends Activity {
 				e.printStackTrace();
 			}
 		}
+		}
 
 	}
 
 	public void sendToPC(String s) {
+		if(!destroyAll){
 		if (isConnectedToPC) {
 			try {
 				pcOutput.writeUTF(s);
@@ -272,6 +317,7 @@ public class Start extends Activity {
 			}
 		} else {
 //			Toast.makeText(getApplicationContext(), "Not connected to PC", Toast.LENGTH_SHORT).show();
+		}
 		}
 	}
 
@@ -301,6 +347,7 @@ public class Start extends Activity {
 		@Override
 		public void onReceive(Context arg0, Intent arg1) {
 			// TODO Auto-generated method stub
+		if(!destroyAll){
 
 			datapassed = arg1.getStringExtra("DATAPASSED");
 			if (!datapassed.equalsIgnoreCase("")) {
@@ -308,22 +355,13 @@ public class Start extends Activity {
 						stringForWaitUser.notify();
 						sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 					}
-					
-//				} else {
-////					sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
-//				}
-//			}else if (datapassed.contains("Help")||datapassed.contains("wake up")){
-//				sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 				}
-
+			}
 		}
 	}
 
 	private class TutorialThread extends Thread {
-		boolean nameRecognized = false;
-		
-		
-		
+		boolean nameRecognized = false;		
 		boolean step1 = true;
 		boolean step2 = false;
 		boolean step3 = false;
@@ -361,6 +399,7 @@ public class Start extends Activity {
 					nameRecognized = true;
 					editor.putString("USER_NAME", name);
 					editor.commit();
+//					sendToRobot(1);
 					sendToPC("Patient name: " + name + ". Interval set to: " + intervalTime + " minutes.");
 				}
 			}
@@ -378,9 +417,7 @@ public class Start extends Activity {
 			helpConversation = false;
 			poHelpie = false;
 			conversationNormalThread.start();
-
 		}
-
 	}
 
 	private class SleepThread extends Thread {
@@ -389,9 +426,7 @@ public class Start extends Activity {
 		public void run() {
 			super.run();
 			normalConversation = false;
-			
-			sayText("Sleep Thred");
-			waitForTTStoFinish();
+
 			sendToPC("sleep");
 			sendToPC("Robot went to sleep mode for " + intervalTime + " minutes.");
 			while (helpConversation==false && normalConversation==false) {
@@ -400,7 +435,7 @@ public class Start extends Activity {
 					new conversationHelpThread().start();				
 					sendToPC("Alert: Patient said help. Checking his status");
 				}else if(ifWakeUp(datapassed)){
-					sendToPC("Robot has been normally woken up by patient");
+					sendToPC("Robot has been normally woken up.");
 					normalConversation = true;
 					new conversationNormalThread().start();	
 					sendToPC("Robot woke up after sleep time. Checking patient status");
@@ -408,7 +443,9 @@ public class Start extends Activity {
 			}
 			if(sleepEnd==true){
 			poHelpie = false;
-			new conversationNormalThread().start();			
+			
+			new conversationNormalThread().start();
+
 			}
 		}
 	}
@@ -417,20 +454,17 @@ public class Start extends Activity {
 		@Override
 		public void run() {
 			super.run();
-			
+			sendToPC("wake");
 			boolean step1 = true;
 			boolean step2 = false;
 			boolean step3 = false;
 //			boolean step4 = false;
 			boolean conEnd = false;
 			
-			sayText("Help Thread...Value is"+conEnd);
-			waitForTTStoFinish();
-			
 			while(conEnd == false){
 				
 				while(step1 == true){
-					sayText("Are you ok Help Thread?");
+					sayText("Are you ok?");
 					waitForTtsAndUser();
 					if (ifAnswer(datapassed)==1) {					
 						step1=false;
@@ -481,7 +515,6 @@ public class Start extends Activity {
 			
 	private class conversationNormalThread extends Thread {
 		
-
 		boolean step1= true;
 		boolean step2= false;
 		boolean step3 =false;
@@ -489,6 +522,7 @@ public class Start extends Activity {
 		boolean conEnd = false;
 		@Override
 		public void run() {	
+			sendToPC("wake");
 			
 		if(poHelpie==false){
 				
@@ -500,12 +534,7 @@ public class Start extends Activity {
 				{
 					sayText("Do you feel good "+name+" ?");
 					waitForTtsAndUser();	
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+
 					if(ifAnswer(datapassed)== 1){
 						step2 = true;
 						step1 = false;
@@ -593,13 +622,13 @@ public class Start extends Activity {
 	private class MonitorPCConnection extends Thread {
 
 		boolean lostConnection = false;
-
+		boolean wakeUp = false;
 		public void run() {
 			super.run();
-
+			
 			while (!lostConnection) {
 				try {
-					Thread.sleep(10000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e) {
 				}
 				lostConnection = sharedPreferences.getBoolean("LOST_CONNECTION", false);
@@ -613,6 +642,40 @@ public class Start extends Activity {
 		}
 
 	}
+	private class WakeUp extends Thread {
+
+		boolean lostConnection = false;
+		String inputFromPC;
+		public void run() {
+			super.run();
+			while (isConnectedToPC) {
+				try {
+					inputFromPC = pcIn.readUTF();
+					if(!inputFromPC.isEmpty()){
+						if(inputFromPC.equalsIgnoreCase("wake up")){						
+							sayText("Supervisor wanted me to check on you");
+							waitForTTStoFinish();
+							datapassed = "wake up";
+						}						
+					}					
+				} catch (Exception e) {
+
+				}
+
+			}
+			
+		}
+	}
 	
+//	public synchronized static void sendToRobot(int i)
+//    {				 
+//		
+//		try {
+//			btSend.write(ConnectToRobot.sendMessageToRobot(i));
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    }
 
 }

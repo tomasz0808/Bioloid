@@ -1,9 +1,7 @@
 package com.example.bioloid;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -12,7 +10,6 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -153,9 +150,9 @@ import android.widget.ToggleButton;
 									
 							        new Thread(new Runnable() { 
 							            public void run(){
-							            	try {
-												if(datainputStream.read()==-1 && !lostConnection)	{																													
-													lostConnection = true;													
+							            	try {							            		
+							            		if(datainputStream.read()==-1 && !lostConnection)	{																													
+							            			lostConnection = true;													
 												}
 											} catch (IOException e){
 												lostConnection = true;												
@@ -167,9 +164,9 @@ import android.widget.ToggleButton;
 																editor.putBoolean("LOST_CONNECTION", lostConnection);
 																editor.commit();	
 																lostConnection = false;		
-																speekIntent.putExtra("Text", "Warning. Connection to the server has been lost.");																	
-																startService(speekIntent);
-																Toast.makeText(getApplicationContext(), "Connection to server Lost", Toast.LENGTH_LONG).show();
+//																speekIntent.putExtra("Text", "Warning. Connection to the server has been lost.");																	
+//																startService(speekIntent);
+//																Toast.makeText(getApplicationContext(), "Connection to server Lost", Toast.LENGTH_LONG).show();
 															}
 							            		});
 							            	}

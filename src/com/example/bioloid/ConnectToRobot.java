@@ -50,7 +50,7 @@ public class ConnectToRobot extends Activity {
 	private ListView searchDeviceList;
 	private ListView pairedDeviceList;
 	private Set<BluetoothDevice> pairedDevices;
-	private OutputStream outputStream;
+	public static OutputStream outputStream;
 	private DataOutputStream PCoutputStream;
 	private InputStream inStream;
 	public static BluetoothSocket socket;

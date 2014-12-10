@@ -58,19 +58,17 @@ public class Speek extends Service implements OnInitListener {
 
 	@SuppressWarnings("deprecation")
 	private void sayHello(String str) {
-	      textToSpeech.speak(str,
-	                TextToSpeech.QUEUE_FLUSH, 
-	                null);
-	      aMenager.setMicrophoneMute(true);
-	      while(textToSpeech.isSpeaking()){
-	    	  
-				
-			}	     	     
-	      aMenager.setMicrophoneMute(false);
-	      synchronized (Start.waitForTTStoFinishString) {
-	    	  Start.waitForTTStoFinishString.notify();
+		if (!Start.destroyAll) {
+			textToSpeech.speak(str, TextToSpeech.QUEUE_FLUSH, null);
+			aMenager.setMicrophoneMute(true);
+			while (textToSpeech.isSpeaking()) {
+
+			}
+			aMenager.setMicrophoneMute(false);
+			synchronized (Start.waitForTTStoFinishString) {
+				Start.waitForTTStoFinishString.notify();
+			}
+			Start.sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
 		}
-	      Start.sendMessage(SpechRecognition.MSG_RECOGNIZER_START_LISTENING);
-			
 	}
 }
