@@ -256,7 +256,7 @@ public class ConnectToRobot extends Activity {
 
         socket.connect();
         outputStream = socket.getOutputStream();
-        outputStream.write(sendMessageToRobot(1));
+//        outputStream.write(sendMessageToRobot(1));
         initConnection();
 	}
 	private void initConnection()

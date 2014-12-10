@@ -89,7 +89,7 @@ public class Start extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		setBackground("angry");
+		setBackground("open");
 		stringForWaitUser = "";
 		waitForTTSandUser = "";
 		waitForTTStoFinishString = "";
@@ -373,6 +373,7 @@ public class Start extends Activity {
 		@Override
 		public void run() {
 
+			
 			super.run();			
 			sendToPC("wake");
 			try {
@@ -382,6 +383,7 @@ public class Start extends Activity {
 			}
 			
 			if(tutorialStart){
+				sendToRobot(1);
 				sendToPC("Robot started with tutorial");
 			}else{
 				sendToPC("Robot started");
@@ -429,6 +431,7 @@ public class Start extends Activity {
 			super.run();
 			normalConversation = false;
 
+			sendToRobot(2);
 			sendToPC("sleep");
 			sendToPC("Robot went to sleep mode for " + intervalTime + " minutes.");
 			while (helpConversation==false && normalConversation==false) {
@@ -456,6 +459,7 @@ public class Start extends Activity {
 		@Override
 		public void run() {
 			super.run();
+			sendToRobot(1);
 			sendToPC("wake");
 			boolean step1 = true;
 			boolean step2 = false;
@@ -525,6 +529,7 @@ public class Start extends Activity {
 		boolean conEnd = false;
 		@Override
 		public void run() {	
+			sendToRobot(1);
 			sendToPC("wake");
 			
 		if(poHelpie==false){
@@ -631,7 +636,10 @@ public class Start extends Activity {
 			
 			while (!lostConnection) {
 				try {
+//					setBackground("open");
 					Thread.sleep(2000);
+//					setBackground("close");
+//					Thread.sleep(500);
 				} catch (InterruptedException e) {
 				}
 				lostConnection = sharedPreferences.getBoolean("LOST_CONNECTION", false);
