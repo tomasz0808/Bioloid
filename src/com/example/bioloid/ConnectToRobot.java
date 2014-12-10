@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.util.Set;
@@ -154,16 +155,25 @@ public class ConnectToRobot extends Activity {
 				
 				
 				//zakomentowane do robienia apki zeby nie ³¹czyc sie za kazdym razem z robotem!!!
-//				if(searchButton.getText().toString().equalsIgnoreCase("Search")){
-//					startBT();	
-//				} else{
+				if(searchButton.getText().toString().equalsIgnoreCase("Search")){
+					startBT();	
+				} else{
 					AlertDialog alert11 = builder1.create();
 		            alert11.show();
-//				}
+				}
 			}
 		});		
 	}
 	
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		if(socket!=null){
+		if(socket.isConnected())
+			searchButton.setText("Start");
+		}
+	}
 	//method to hide icons if bt is off
 	private void hideIcons(boolean b) {
 		// TODO Auto-generated method stub
@@ -235,6 +245,15 @@ public class ConnectToRobot extends Activity {
 		BluetoothDevice device = bluetoothAdapter.getRemoteDevice(key);
         ParcelUuid[] uuids = device.getUuids();        
         socket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
+        Method m;
+		try {
+			m = device.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+			socket = (BluetoothSocket) m.invoke(device, 1);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
         socket.connect();
         outputStream = socket.getOutputStream();
         outputStream.write(sendMessageToRobot(1));

@@ -37,7 +37,7 @@ public class Start extends Activity {
 
 	public Socket pcSocket;
 //	public BluetoothSocket btSocket;
-//	public static OutputStream btSend;
+	public static OutputStream btSend;
 	public static DataOutputStream pcOutput;
 	public static DataInputStream pcIn;
 
@@ -170,9 +170,10 @@ public class Start extends Activity {
 		if (ConnectToPC.socketOut != null && ConnectToPC.socketOut.isConnected()) {
 			try {
 				pcSocket = ConnectToPC.socketOut;
-				pcOutput = new DataOutputStream(pcSocket.getOutputStream());
-				pcIn = new DataInputStream(pcSocket.getInputStream());
+				pcOutput = 	new DataOutputStream(pcSocket.getOutputStream());
+				pcIn = 		new DataInputStream(pcSocket.getInputStream());
 				sendToPC("wake");
+				btSend = ConnectToRobot.outputStream;
 				monitorPcConnection = new MonitorPCConnection();
 				wakeUp = new WakeUp();
 				isConnectedToPC = true;
@@ -232,6 +233,7 @@ public class Start extends Activity {
 			if(conversationNormalThread.isAlive()){
 				conversationNormalThread.interrupt();}}
 		onDestroy();
+		System.exit(0);
 	}
 
 
@@ -505,6 +507,7 @@ public class Start extends Activity {
 //					} catch (InterruptedException e) {
 //					}
 					sayText("Ok, I'm going to sleep now");
+					waitForTTStoFinish();
 					
 					helpConversation = false;
 					new SleepThread().start();
@@ -645,21 +648,22 @@ public class Start extends Activity {
 	private class WakeUp extends Thread {
 
 		boolean lostConnection = false;
-		String inputFromPC;
+		int inputFromPC;
 		public void run() {
 			super.run();
-			while (isConnectedToPC) {
+			while (true) {
 				try {
-					inputFromPC = pcIn.readUTF();
-					if(!inputFromPC.isEmpty()){
-						if(inputFromPC.equalsIgnoreCase("wake up")){						
-							sayText("Supervisor wanted me to check on you");
-							waitForTTStoFinish();
+					inputFromPC = pcIn.read();
+					if(inputFromPC == 119){
+//						if(inputFromPC.equalsIgnoreCase("wake up")){						
+//							sayText("Supervisor wanted me to check on you");
+//							waitForTTStoFinish();
 							datapassed = "wake up";
-						}						
+//							Toast.makeText(getApplicationContext(), "HUJHUJHUJHUJ", Toast.LENGTH_LONG).show();
+//						}						
 					}					
 				} catch (Exception e) {
-
+//					sayText("Connection to the server has been lost");
 				}
 
 			}
@@ -667,15 +671,15 @@ public class Start extends Activity {
 		}
 	}
 	
-//	public synchronized static void sendToRobot(int i)
-//    {				 
-//		
-//		try {
-//			btSend.write(ConnectToRobot.sendMessageToRobot(i));
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//    }
+	public synchronized static void sendToRobot(int i)
+    {				 
+		
+		try {
+			btSend.write(ConnectToRobot.sendMessageToRobot(i));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 
 }
